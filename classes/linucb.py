@@ -5,7 +5,7 @@ class linUBC:
         self.d = arms_matrix.shape[1]
         self.arms = arms_matrix
         self.design_matrix = lam*np.identity(self.d)
-        self.load = np.zeros(self.d)
+        self.load = np.zeros(self.d).reshape(-1,1)
 
     def update(self, arm, reward):
         self.design_matrix += np.matmul(arm.reshape(-1,1),arm.reshape(1,-1))
