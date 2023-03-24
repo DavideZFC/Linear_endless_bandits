@@ -7,3 +7,7 @@ class Environment:
     
     def pull_arm(self, arm):
         return np.dot(arm, self.theta) + np.random.normal(0,self.sd)
+    
+    def get_optimum(self, arms):
+        means = np.matmul(arms, self.theta.reshape(-1, 1))
+        return max(means)

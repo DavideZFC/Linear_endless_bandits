@@ -11,6 +11,7 @@ class linUBC:
 
         # matrix of the arms
         self.arms = arms_matrix
+        self.n_arms = self.arms.shape[0]
 
         # initialization of the matrix A of the system
         self.design_matrix = lam*np.identity(self.d)
@@ -20,6 +21,7 @@ class linUBC:
 
         # time horizon
         self.T = T
+        self.t = 0
 
         # error probability
         self.delta = 1/T
@@ -36,6 +38,12 @@ class linUBC:
 
         self.compute_beta_routine()
 
+    def reset(self):
+        self.design_matrix = self.lam*np.identity(self.d)
+        self.load = np.zeros(self.d).reshape(-1,1)
+        self.t = 0
+
+
     def norm(self,v):
         return (np.sum(v**2))**0.5
 
@@ -51,6 +59,51 @@ class linUBC:
     def update(self, arm, reward):
         self.design_matrix += np.matmul(arm.reshape(-1,1),arm.reshape(1,-1))
         self.load += reward*arm.reshape(-1,1)
+
+    def find_maximum(self, A, v):
+        ''' computes the maximum of the linear form (x.T*v)(x.T*A*x) '''
+
+        def diaginv(A):
+            d = A.shape[0]
+            B = np.zeros_like(A)
+            for i in range(d):
+                B[i,i] = A[i,i]**(-1)
+            return B
+
+        def makediag(D):
+            d = len(D)
+            I = np.identity(d)
+            for i in range(d):
+                I[i,i] = D[i]
+            return I
+        D, U = np.linalg.eig(A)
+        
+        D = makediag(D)
+        invD = diaginv(D)
+
+
+        matrix = np.matmul(invD**(0.5),U.T)
+        v_based = np.matmul(matrix, v.reshape(-1,1))
+        
+        return (np.sum(v_based**2))**0.5
+    
+
+
+    def pull_arm(self):
+        estimates = np.zeros(self.n_arms)
+        thetahat = self.estimate_theta().flatten()
+
+
+        for i in range(self.n_arms):
+            estimates[i] = np.dot(thetahat, self.arms[i,:])
+            upper_bound = self.find_maximum(self.design_matrix, self.arms[i])
+            estimates[i] += self.beta[self.t]*upper_bound
+
+        self.t += 1
+
+        return self.arms[np.argmax(estimates)]
+
+
 
     def estimate_theta(self):
         return np.linalg.solve(self.design_matrix, self.load)
