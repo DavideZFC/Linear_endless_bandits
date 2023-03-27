@@ -101,7 +101,7 @@ class linUBC:
 
         self.t += 1
 
-        return self.arms[np.argmax(estimates)]
+        return self.arms[np.argmax(estimates)], np.argmax(estimates)
 
 
 

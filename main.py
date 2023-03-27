@@ -16,7 +16,7 @@ opt = env.get_optimum(arms)
 reward_vector = np.zeros(T)
 
 for t in range(T):
-    arm = policy.pull_arm()
+    arm, _ = policy.pull_arm()
     reward = env.pull_arm(arm)
     reward_vector[t] = reward
     policy.update(arm, reward)

@@ -8,7 +8,7 @@ class Lipschitz_Environment:
     The arms are self.x, they lay in the interval [0,lim]
     '''
 
-    def __init__(self, n_arms=200, lim=10, L=1, curve='sin-like', seed = 257):
+    def __init__(self, n_arms=200, lim=1, sigma=0.1, curve='sin-like', seed = 257):
         '''
         numel = number of arms
         lim = range of the arms [0,lim]
@@ -36,12 +36,18 @@ class Lipschitz_Environment:
         # difference between consecutive arms
         self.h = self.x[1] - self.x[0]
 
+        # standard deviation of the noise
+        self.sigma = sigma
+
         # make curve
         self.generate_curves(curve)
         
             
 
     def generate_curves(self, curve):
+
+        if (curve == 'cosine'):
+            self.y = np.cos(np.pi*self.x)
 
         if (curve == 'sin-like'):
             for i in range(self.n_arms):
@@ -75,7 +81,7 @@ class Lipschitz_Environment:
 
 
     def pull_arm(self, arm):
-        reward = np.random.binomial(1, self.y[arm])
+        reward = np.random.normal(self.y[arm], self.sigma)
         return reward
 
     def get_optimum(self):
