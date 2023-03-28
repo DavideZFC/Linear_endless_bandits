@@ -5,10 +5,12 @@ from classes.linucb import linUBC
 from classes.lipucb import lipUCB
 import matplotlib.pyplot as plt
 
+import time
+start = time.time()
 
 d = 5
 n_arms = 100
-T = 1000
+T = 20000
 theta = np.array([0., 1., 0., 0., 0.])
 
 env = Environment(theta)
@@ -24,6 +26,10 @@ for t in range(T):
     reward = env.pull_arm(arm)
     reward_vector[t] = reward
     policy.update(arm, reward)
+
+end = time.time()
+
+print('Tempo trascorso = {}'.format(end-start))
 
 plt.plot(reward_vector)
 plt.axhline(y=opt, color = 'C1', linestyle='dashed')

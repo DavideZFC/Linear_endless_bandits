@@ -3,12 +3,12 @@ from classes.lipschitz_env import Lipschitz_Environment
 from classes.lipucb import lipUCB
 import matplotlib.pyplot as plt
 
-env = Lipschitz_Environment(lim=1.0, curve = 'cosine', n_arms=100)
+env = Lipschitz_Environment(lim=1.0, curve = 'gaussian', n_arms=100)
 env.plot_curve()
 
-T = 1000
-d = 5
-m = 2
+T = 10000
+d = 8
+m = 0.1
 policy = lipUCB(env.x, d, T, m=m)
 reward_vector = np.zeros(T)
 

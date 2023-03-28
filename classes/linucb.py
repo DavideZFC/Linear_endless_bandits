@@ -94,16 +94,55 @@ class linUBC:
         return (np.sum(v_based**2))**0.5
     
 
+    def compute_reverse_matrix(self, A):
+        def diaginv(A):
+            d = A.shape[0]
+            B = np.zeros_like(A)
+            for i in range(d):
+                B[i,i] = A[i,i]**(-1)
+            return B
+
+        def makediag(D):
+            d = len(D)
+            I = np.identity(d)
+            for i in range(d):
+                I[i,i] = D[i]
+            return I
+        
+        D, U = np.linalg.eig(A)
+        if (np.any(np.iscomplex(D))):
+            print('Complex number found at step {}'.format(self.t))
+            Dimag = np.imag(D)
+            D = np.real(D)
+            print('Eliminated imaginary part of modulus {}'.format(np.sum(np.abs(Dimag))))
+            U = np.real(U)
+        
+        
+        D = makediag(D)
+        invD = diaginv(D)
+
+
+        matrix = np.matmul(invD**(0.5),U.T)
+        return matrix
+    
+
 
     def pull_arm(self):
         estimates = np.zeros(self.n_arms)
         thetahat = self.estimate_theta().flatten()
+        mat = self.compute_reverse_matrix(self.design_matrix)
 
-
+        '''
         for i in range(self.n_arms):
             estimates[i] = np.dot(thetahat, self.arms[i,:])
             upper_bound = self.find_maximum(self.design_matrix, self.arms[i])
             estimates[i] += self.beta[self.t]*upper_bound
+        '''
+        estimates = np.matmul(self.arms, thetahat.reshape(-1,1))
+        upper_bounds =self.beta[self.t]*np.matmul(self.arms, mat.T)
+        a = np.sum(upper_bounds**2, axis = 1)**0.5
+        a = a.reshape(-1,1)
+        estimates += a
 
         self.t += 1
 
