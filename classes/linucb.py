@@ -76,7 +76,13 @@ class linUBC:
             for i in range(d):
                 I[i,i] = D[i]
             return I
+        
         D, U = np.linalg.eig(A)
+        if (0 and np.any(np.iscomplex(D))):
+            print('Complex number found at step {}'.format(self.t))
+            print(D)
+            print(A)
+        
         
         D = makediag(D)
         invD = diaginv(D)

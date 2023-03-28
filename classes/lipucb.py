@@ -2,7 +2,7 @@ from classes.linucb import linUBC
 import numpy as np
 
 class lipUCB:
-    def __init__(self, arms, d, T=10000):
+    def __init__(self, arms, d, lam=1, T=10000, m=1):
         # dimension of the problem
         self.d = d
 
@@ -14,7 +14,7 @@ class lipUCB:
         self.T = T
 
         # initialize learner
-        self.make_linUCB()
+        self.make_linUCB(lam, m)
 
 
     def make_cosin_arms(self):
@@ -25,13 +25,13 @@ class lipUCB:
             self.linUCBarms[:,j] = np.cos(np.pi*j*self.arms)
 
         
-    def make_linUCB(self):
+    def make_linUCB(self, lam, m):
 
         # prepare feature matrix
         self.make_cosin_arms()
 
         # initialize linUCB
-        self.learner = linUBC(self.linUCBarms, T=self.T)
+        self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)
 
     def pull_arm(self):
         
