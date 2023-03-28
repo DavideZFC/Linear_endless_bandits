@@ -24,7 +24,7 @@ class Lipschitz_Environment:
         self.curve = curve
 
         # set of arms
-        self.x = np.linspace(-lim,lim, n_arms)
+        self.x = np.linspace(-lim, lim, n_arms)
         self.lim = lim
 
         # number of arms
@@ -46,8 +46,13 @@ class Lipschitz_Environment:
 
     def generate_curves(self, curve):
 
+        if (curve == 'gaussian'):
+            sigma = 0.3
+            self.y = (1/2*np.pi*sigma**2)**0.5*np.exp(-(self.x)**2/(2*sigma**2))
+
         if (curve == 'cosine'):
             self.y = np.cos(np.pi*self.x)
+
 
         if (curve == 'sin-like'):
             for i in range(self.n_arms):
