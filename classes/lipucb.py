@@ -16,6 +16,9 @@ class lipUCB:
         # initialize learner
         self.make_linUCB(lam, m)
 
+    def reset(self):
+        self.learner.reset()
+
 
     def make_cosin_arms(self):
         self.linUCBarms = np.zeros((self.n_arms, self.d))

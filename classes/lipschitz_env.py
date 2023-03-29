@@ -41,6 +41,9 @@ class Lipschitz_Environment:
 
         # make curve
         self.generate_curves(curve)
+
+        # compute optimum
+        self.get_optimum()
         
             
 
@@ -87,9 +90,11 @@ class Lipschitz_Environment:
 
     def pull_arm(self, arm):
         reward = np.random.normal(self.y[arm], self.sigma)
-        return reward
+        expected_regret = self.opt - self.y[arm]
+        return reward, expected_regret
 
     def get_optimum(self):
+        self.opt = max(self.y)
         return max(self.y)
 
     def plot_curve(self):
