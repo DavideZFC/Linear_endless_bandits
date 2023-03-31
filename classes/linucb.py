@@ -111,10 +111,10 @@ class linUBC:
         
         D, U = np.linalg.eig(A)
         if (np.any(np.iscomplex(D))):
-            print('Complex number found at step {}'.format(self.t))
+            # print('Complex number found at step {}'.format(self.t))
             Dimag = np.imag(D)
             D = np.real(D)
-            print('Eliminated imaginary part of modulus {}'.format(np.sum(np.abs(Dimag))))
+            # print('Eliminated imaginary part of modulus {}'.format(np.sum(np.abs(Dimag))))
             U = np.real(U)
         
         
