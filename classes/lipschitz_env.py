@@ -63,7 +63,7 @@ class Lipschitz_Environment:
 
 
         elif (curve == 'spike'):
-            spike_par = 0.3
+            spike_par = 0.5
             mean_x = self.x[self.n_arms//2]
             for i in range(self.n_arms):
                 if (abs(self.x[i]-mean_x)<spike_par):
@@ -73,6 +73,11 @@ class Lipschitz_Environment:
         elif (curve == 'random'):
             for i in range(1,self.n_arms):
                 self.y[i] = np.clip(self.y[i-1] + np.random.uniform(-self.h, self.h), 0,1)
+
+        elif (curve == 'symrandom'):
+            for i in range(1,int(self.n_arms//2)+1):
+                self.y[i] = np.clip(self.y[i-1] + np.random.uniform(-self.h, self.h), 0,1)
+                self.y[self.n_arms - i] = self.y[i]
 
 
         elif (curve == 'francesco'):

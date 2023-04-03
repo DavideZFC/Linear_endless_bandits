@@ -21,7 +21,7 @@ dir = 'results/'+'_'+tail+curve
 os.mkdir(dir)
 dir = dir+'/'
  
-env = Lipschitz_Environment(lim=1.0, curve = curve, n_arms=100)
+env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
 T = 10000
