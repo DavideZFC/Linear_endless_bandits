@@ -1,10 +1,10 @@
 import numpy as np
 
-def test_algorithm(policy, env, T, seeds):
+def test_algorithm(policy, env, T, seeds, first_seed=1):
 
     regret_matrix = np.zeros((seeds, T))
+    np.random.seed(first_seed)
 
-    opt = env.get_optimum()
     for seed in range(seeds):
 
         policy.reset()

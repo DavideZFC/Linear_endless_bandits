@@ -11,12 +11,13 @@ start = time.time()
 d = 5
 n_arms = 100
 T = 20000
-theta = np.array([0., 1., 0., 0., 0.])
+m = 100
+theta = np.array([0.9, -1., 1., -1., 1.1])
 
-env = Environment(theta)
+env = Environment(theta, sd=0.2)
 
 arms = np.random.normal(size=(n_arms,d))
-policy = linUBC(arms_matrix=arms, T=T)
+policy = linUBC(arms_matrix=arms, T=T, m=m)
 opt = env.get_optimum(arms)
 
 reward_vector = np.zeros(T)
