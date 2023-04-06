@@ -1,7 +1,7 @@
 import numpy as np
 
 class linUBC:
-    def __init__(self, arms_matrix, lam=1, T=1000000, m=1):
+    def __init__(self, arms_matrix, lam=0.01, T=1000000, m=1):
 
         # dimension of the arms
         self.d = arms_matrix.shape[1]

@@ -14,6 +14,8 @@ import datetime
 import time
 import json
 
+save = False
+
 curve = 'cosine'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
@@ -27,9 +29,10 @@ env.plot_curve()
 T = 10000
 d = 8
 seeds = 20
+m = 0.1
 
 
-policies = [UCB1(len(env.x)), ZOOM(env.x), lipUCB(env.x, d, T, m=0.1)]# GPTS(env.x), Gauss_Bandit(env.x), 
+policies = [UCB1(len(env.x)), ZOOM(env.x), lipUCB(env.x, d, T, m=m)]# GPTS(env.x), Gauss_Bandit(env.x), 
 labels = ['UCB1', 'ZOOM', 'LipUCB']# 'GPTS', 'GaussUCB', 
 
 running_times = {}
@@ -59,6 +62,8 @@ with open(dir+"running_times.json", "w") as f:
     json.dump(running_times, f)
 
 plt.legend()
-plt.title('Regret curves')
-plt.savefig(dir+'regret_plot.pdf')
-# plt.show()
+
+if save:
+    plt.title('Regret curves')
+    plt.savefig(dir+'regret_plot.pdf')
+plt.show()
