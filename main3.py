@@ -45,8 +45,12 @@ labels = ['UCB1', 'ZOOM', 'LipUCB']# 'GPTS', 'GaussUCB',
 
 running_times = {}
 
-results = []    
+results = [] 
+
 for i in range(len(policies)):
+
+    ####################################
+    # actual algorithm simulation
 
     # evaluate running time of the algorithm
     t0 = time.time()
@@ -60,13 +64,18 @@ for i in range(len(policies)):
     
     print(labels[i] + ' finished')
 
-for i in range(len(results)):
-    results[i] = np.concatenate(results[i], axis=0)
-    low, high = bootstrap_ci(results[i])
-    plot_data(np.arange(0,T), low, high, col='C{}'.format(i), label=labels[i])
-    print(results[i].shape)
+    ####################################
+    # part to save data
 
-for i in range(len(labels)):
+    results[i] = np.concatenate(results[i], axis=0)
+
+    # make nonparametric confidence intervals
+    low, high = bootstrap_ci(results[i])
+
+    # make plot
+    plot_data(np.arange(0,T), low, high, col='C{}'.format(i), label=labels[i])
+
+    # save data in given folder
     np.save(dir+labels[i], results[i])
 
 
