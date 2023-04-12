@@ -1,7 +1,7 @@
 from classes.linucb import linUBC
 import numpy as np
 
-class lipUCB:
+class FourierUCB:
     def __init__(self, arms, d, lam=1, T=10000, m=1):
         # dimension of the problem
         self.d = d
