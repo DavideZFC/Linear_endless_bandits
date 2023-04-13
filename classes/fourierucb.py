@@ -27,11 +27,27 @@ class FourierUCB:
         for j in range(self.d):
             self.linUCBarms[:,j] = np.cos(np.pi*j*self.arms)
 
+    def make_sincos_arms(self):
+        self.linUCBarms = np.zeros((self.n_arms, self.d))
+
+        # build linear features from the arms
+        for j in range(self.d):
+            if j == 0:
+                # the constant tem is normalized to have L2 norm equal to one on [-1, 1]
+                self.linUCBarms[:,j] = (1/2)**0.5
+            elif j%2 == 1:
+                eta = j//2+1
+                self.linUCBarms[:,j] = np.sin(np.pi*eta*self.arms)
+            else:
+                eta = j//2
+                self.linUCBarms[:,j] = np.cos(np.pi*eta*self.arms)        
+
         
     def make_linUCB(self, lam, m):
 
         # prepare feature matrix
-        self.make_cosin_arms()
+        # self.make_cosin_arms()
+        self.make_sincos_arms()
 
         # initialize linUCB
         self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)

@@ -17,7 +17,7 @@ import json
 
 save = True
 
-curve = 'cosine'
+curve = 'gaussian'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -32,16 +32,20 @@ T = 10000
 d = 8
 seeds = 5
 m = 0.1
-m_list = [0.01, 0.1, 1.0]
-d_list = [4, 6, 8]
+m_list = [1.0, 10.0]
+d_list = [8, 12]
+lambda_list = [10.0, 100.0]
 
-policies = [UCB1(len(env.x))]# LegendreUCB(env.x, d, T, m=m) , FourierUCB(env.x, d, T, m=m), ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1']#'LegrendreUCB', 'FourierUCB', 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), FourierUCB(env.x, d, T, m=m)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
+labels = ['UCB1', 'FourierUCB']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+
 
 for mu in m_list:
     for di in d_list:
-        policies.append(LegendreUCB(env.x, di, T=T, m=mu))
-        labels.append('Legendre_m={}_d={}'.format(mu,di))
+        for lam in lambda_list:
+            policies.append(LegendreUCB(env.x, di, lam=lam, T=T, m=mu))
+            labels.append('Legendre_m={}_d={}_lam={}'.format(mu,di,lam))
+
 
 running_times = {}
 for i in range(len(policies)):
