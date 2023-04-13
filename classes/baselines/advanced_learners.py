@@ -25,6 +25,7 @@ class Gauss_Bandit():
             return self.step
         else:
             mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+            # here we have to add some coefficient
             return np.argmax(mean + std)
 
     def update(self, arm, reward):

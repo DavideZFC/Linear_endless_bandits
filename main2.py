@@ -17,7 +17,7 @@ import json
 
 save = True
 
-curve = 'gaussian'
+curve = 'randpoly'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -29,23 +29,30 @@ env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
 T = 10000
-d = 8
 seeds = 5
-m = 0.1
+
+# Fourier parameters
+mf = 0.1
+df = 8
+
+# Legendre parameters
+ml = 1.0
+dl = 6
+
 m_list = [1.0, 10.0]
 d_list = [8, 12]
 lambda_list = [10.0, 100.0]
 
-policies = [UCB1(len(env.x)), FourierUCB(env.x, d, T, m=m)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1', 'FourierUCB']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
+labels = ['UCB1', 'FourierUCB', 'Legendre']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
-
+'''
 for mu in m_list:
     for di in d_list:
         for lam in lambda_list:
             policies.append(LegendreUCB(env.x, di, lam=lam, T=T, m=mu))
             labels.append('Legendre_m={}_d={}_lam={}'.format(mu,di,lam))
-
+'''
 
 running_times = {}
 for i in range(len(policies)):

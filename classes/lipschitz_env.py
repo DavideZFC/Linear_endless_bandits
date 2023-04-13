@@ -53,11 +53,22 @@ class Lipschitz_Environment:
             sigma = 0.3
             self.y = (1/2*np.pi*sigma**2)**0.5*np.exp(-(self.x)**2/(2*sigma**2))
 
-        if (curve == 'cosine'):
+        elif (curve == 'cosine'):
             self.y = np.cos(np.pi*self.x)
 
+        elif (curve == 'poly'):
+            z1 = -0.75
+            z2 = 0.75
+            self.y = -(self.x - z1)**2*(self.x - z2)**2
 
-        if (curve == 'sin-like'):
+        elif (curve == 'randpoly'):
+            a = np.random.normal(0,1)
+            b = np.random.normal(0,1)
+            c = np.random.normal(0,1)
+            self.y = a*self.x**2 + b*self.x + c
+
+
+        elif (curve == 'sin-like'):
             for i in range(self.n_arms):
                 self.y[i] = (self.x[i]/self.lim)*np.cos(self.x[i])**2
 
