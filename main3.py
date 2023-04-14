@@ -4,7 +4,7 @@ from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
-from classes.baselines.advanced_learners import Gauss_Bandit, GPTS
+from classes.baselines.advanced_learners import IGP_UCB
 import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
@@ -18,7 +18,7 @@ import json
 
 save = False
 
-curve = 'cosine'
+curve = 'gaussian'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 # dir = 'data/davide/RankingBandit'+'_'+tail
@@ -32,16 +32,26 @@ print("Linear Endless Bandit Performances on Synthetic Data\n")
 print("-----------------------------------------------------------\n")
 
 
-env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
-
+env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
 T = 1000
-d = 8
 seeds = 20
-m = 0.1
-parameters = {'T':T, 'd':d, 'seeds':seeds, 'm':m}
 
-policies = [UCB1(len(env.x)), ZOOM(env.x), FourierUCB(env.x, d, T, m=m)]# GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1', 'ZOOM', 'LipUCB']# 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), ZOOM(env.x), IGP_UCB(env.x, T, update_every=10)]
+labels = ['UCB1', 'ZOOM', 'IGP-UCB']
+
+############# Fourier
+mf = 0.1
+df = 8
+policies += [FourierUCB(env.x, df, T, m=mf), FourierUCB(env.x, df, T, m=mf, only_even=True)]
+labels += ['FourierUCB', 'FourierUCB_even']
+
+############# Legendre
+ml = 1.0
+dl = 6
+policies += [LegendreUCB(env.x, dl, T=T, m=ml), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True)]
+labels += ['LegendreUCB', 'LegendreUCB_even']
+
+parameters = {'mf': mf, 'df': df, 'ml': ml, 'dl': dl}
 
 running_times = {}
 

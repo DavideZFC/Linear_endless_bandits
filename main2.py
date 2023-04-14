@@ -28,7 +28,7 @@ if save:
 env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
-T = 1000
+T = 10000
 seeds = 5
 
 # Fourier parameters
@@ -43,8 +43,8 @@ m_list = [1.0, 10.0]
 d_list = [8, 12]
 lambda_list = [10.0, 100.0]
 
-policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), IGP_UCB(env.x, T), IGP_UCB(env.x, T, update_every=10)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'IGP_UCB', 'IGP_UCB_UE10']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True)]# IGP_UCB(env.x, T), IGP_UCB(env.x, T, update_every=10), ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
+labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'EvenFourier', 'EvenLegendre']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''
 for mu in m_list:
