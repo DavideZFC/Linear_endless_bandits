@@ -4,7 +4,7 @@ from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
-from classes.baselines.advanced_learners import Gauss_Bandit, GPTS
+from classes.baselines.advanced_learners import Gauss_Bandit, GPTS, IGP_UCB
 import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
@@ -17,7 +17,7 @@ import json
 
 save = True
 
-curve = 'randpoly'
+curve = 'gaussian'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -28,7 +28,7 @@ if save:
 env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
-T = 10000
+T = 1000
 seeds = 5
 
 # Fourier parameters
@@ -43,8 +43,8 @@ m_list = [1.0, 10.0]
 d_list = [8, 12]
 lambda_list = [10.0, 100.0]
 
-policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1', 'FourierUCB', 'Legendre']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), IGP_UCB(env.x, T), IGP_UCB(env.x, T, update_every=10)]#, ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
+labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'IGP_UCB', 'IGP_UCB_UE10']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''
 for mu in m_list:

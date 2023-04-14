@@ -1,6 +1,7 @@
 import numpy as np
 from classes.lipschitz_env import Lipschitz_Environment
-from classes.lipucb import lipUCB
+from classes.fourierucb import FourierUCB
+from classes.legendreucb import LegendreUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import Gauss_Bandit, GPTS
@@ -32,7 +33,6 @@ print("-----------------------------------------------------------\n")
 
 
 env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
-env.plot_curve()
 
 T = 1000
 d = 8
@@ -40,7 +40,7 @@ seeds = 20
 m = 0.1
 parameters = {'T':T, 'd':d, 'seeds':seeds, 'm':m}
 
-policies = [UCB1(len(env.x)), ZOOM(env.x), lipUCB(env.x, d, T, m=m)]# GPTS(env.x), Gauss_Bandit(env.x), 
+policies = [UCB1(len(env.x)), ZOOM(env.x), FourierUCB(env.x, d, T, m=m)]# GPTS(env.x), Gauss_Bandit(env.x), 
 labels = ['UCB1', 'ZOOM', 'LipUCB']# 'GPTS', 'GaussUCB', 
 
 running_times = {}

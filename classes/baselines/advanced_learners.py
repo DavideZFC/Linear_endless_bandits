@@ -41,6 +41,50 @@ class Gauss_Bandit():
         self.step = 0
 
 
+class IGP_UCB():
+    '''
+    From the article "On Kernelized Multi-armed Bandits"
+    '''
+    def __init__(self, arms, T=10000, B=10, R=1, update_every=50, warmup=10):
+        '''
+        arms = arms of the environment
+        '''
+        self.arms = arms
+        self.N = len(arms)
+        self.eval_x = []
+        self.eval_y = []
+        self.gp = GaussianProcessRegressor(normalize_y=True)
+        self.step = 0
+        self.update_every = update_every
+        self.T = T
+        self.delta = 1/T
+        self.B = B
+        self.R = R
+        self.warmup_steps = warmup
+
+    def pull_arm(self):
+        self.step += 1
+        if self.step < self.warmup_steps:
+            return np.random.randint(self.N)
+        else:
+            mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+            gamma = np.log(self.step)**2
+            beta = self.B + self.R*np.sqrt(2*gamma + 1 + np.log(1/self.delta))
+            return np.argmax(mean + beta*std)
+
+    def update(self, arm, reward):
+        self.eval_x.append(self.arms[arm])
+        self.eval_y.append(reward)
+        if (self.step > 10 and self.step % self.update_every == self.update_every-1):
+            self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
+
+    def reset(self):     
+        self.eval_x = []
+        self.eval_y = []
+        self.gp = GaussianProcessRegressor(normalize_y=True)
+        self.step = 0
+
+
 
 class GPTS():
     '''

@@ -7,7 +7,7 @@ N = 100
 
 x = np.linspace(-1,1,N)
 
-policy = FourierUCB(arms=x, d=6)
+policy = LegendreUCB(arms=x, d=6)
 
 arms = policy.linUCBarms
 

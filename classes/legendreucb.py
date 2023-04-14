@@ -2,8 +2,10 @@ from classes.linucb import linUBC
 import numpy as np
 from math import comb
 
+# TODO normalizzare i polinomi in L2
+
 class LegendreUCB:
-    def __init__(self, arms, d, lam=1, T=10000, m=1):
+    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False):
         # dimension of the problem
         self.d = d
 
@@ -13,6 +15,9 @@ class LegendreUCB:
 
         # time horizon
         self.T = T
+
+        # parameter so see if we have an even function
+        self.even = only_even
 
         # initialize learner
         self.make_linUCB(lam, m)
@@ -58,8 +63,21 @@ class LegendreUCB:
         # build linear features from the arms
         for j in range(self.d):
             
-            # compute degree d legendre polynomial
+            # compute degree j legendre polynomial
             coef = self.get_legendre_poly(j)
+            
+            # apply polynomial to the arms
+            self.linUCBarms[:,j] = self.apply_poly(coef, self.arms)
+
+
+    def make_legendre_even_arms(self):
+        self.linUCBarms = np.zeros((self.n_arms, self.d))
+
+        # build linear features from the arms
+        for j in range(self.d):
+            
+            # compute degree 2j legendre polynomial (not j, here we want only even polynomials)
+            coef = self.get_legendre_poly(2*j)
             
             # apply polynomial to the arms
             self.linUCBarms[:,j] = self.apply_poly(coef, self.arms)
@@ -68,7 +86,10 @@ class LegendreUCB:
     def make_linUCB(self, lam, m):
 
         # prepare feature matrix
-        self.make_legendre_arms()
+        if self.even:
+            self.make_legendre_even_arms()
+        else:
+            self.make_legendre_arms()
 
         # initialize linUCB
         print('Instance linUCB with T='+str(self.T))

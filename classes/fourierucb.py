@@ -2,7 +2,7 @@ from classes.linucb import linUBC
 import numpy as np
 
 class FourierUCB:
-    def __init__(self, arms, d, lam=1, T=10000, m=1):
+    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False):
         # dimension of the problem
         self.d = d
 
@@ -12,6 +12,9 @@ class FourierUCB:
 
         # time horizon
         self.T = T
+
+        # parameter so see if we have an even function
+        self.even = only_even
 
         # initialize learner
         self.make_linUCB(lam, m)
@@ -46,8 +49,10 @@ class FourierUCB:
     def make_linUCB(self, lam, m):
 
         # prepare feature matrix
-        # self.make_cosin_arms()
-        self.make_sincos_arms()
+        if self.even:
+            self.make_cosin_arms()
+        else:
+            self.make_sincos_arms()
 
         # initialize linUCB
         self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)
