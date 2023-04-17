@@ -4,7 +4,7 @@ import numpy as np
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 
-dir = 'results\_23_04_15-10_35_gaussian'
+dir = 'results\_23_04_17-15_20_gaussian'
 
 with open(dir+"/running_times.json", "r") as f:
     # Convert the dictionary to a JSON string and write it to the file
@@ -19,7 +19,7 @@ plt.ylabel('log(time)')
 plt.savefig(dir+'/running_times.pdf')
 plt.show()
 
-'''
+
 labels = list(running_times.keys())
 print(labels)
 
@@ -44,6 +44,5 @@ plt.legend()
 plt.title('Regret curves')
 plt.savefig(dir+'/regret_plot.pdf')
 
-'''
 
 
