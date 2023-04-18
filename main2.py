@@ -2,6 +2,7 @@ import numpy as np
 from classes.lipschitz_env import Lipschitz_Environment
 from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
+from classes.chebishevucb import ChebishevUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import Gauss_Bandit, GPTS, IGP_UCB
@@ -17,7 +18,7 @@ import json
 
 save = True
 
-curve = 'gaussian'
+curve = 'poly'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -39,20 +40,25 @@ df = 8
 ml = 1.0
 dl = 6
 
-m_list = [1.0, 10.0]
-d_list = [8, 12]
-lambda_list = [10.0, 100.0]
+# Chebishev parameters
+mc = 1.0
+dc = 7
 
-policies = [UCB1(len(env.x)), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True)]# IGP_UCB(env.x, T), IGP_UCB(env.x, T, update_every=10), ZOOM(env.x), GPTS(env.x), Gauss_Bandit(env.x), 
-labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'EvenFourier', 'EvenLegendre']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
-'''
+
+policies = [UCB1(len(env.x))]#, FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+labels = ['UCB1']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+
+
+m_list = [0.1, 1.0]
+d_list = [6, 8]
+lambda_list = [0.1, 1.0]
 for mu in m_list:
     for di in d_list:
         for lam in lambda_list:
-            policies.append(LegendreUCB(env.x, di, lam=lam, T=T, m=mu))
-            labels.append('Legendre_m={}_d={}_lam={}'.format(mu,di,lam))
-'''
+            policies.append(ChebishevUCB(env.x, di, lam=lam, T=T, m=mu))
+            labels.append('Chebishev_m={}_d={}_lam={}'.format(mu,di,lam))
+
 
 running_times = {}
 for i in range(len(policies)):
