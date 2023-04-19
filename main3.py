@@ -5,6 +5,7 @@ from classes.lipschitz_env import Lipschitz_Environment
 from classes.lipschitz_env import Lipschitz_Environment
 from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
+from classes.chebishevucb import ChebishevUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import IGP_UCB, Gauss_Bandit
