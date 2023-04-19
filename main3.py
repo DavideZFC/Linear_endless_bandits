@@ -1,27 +1,34 @@
 import numpy as np
+
+from classes.lipschitz_env import *
+from classes.lipschitz_env import Lipschitz_Environment
 from classes.lipschitz_env import Lipschitz_Environment
 from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
-from classes.baselines.advanced_learners import IGP_UCB
-import matplotlib.pyplot as plt
+from classes.baselines.advanced_learners import IGP_UCB, Gauss_Bandit
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 import os
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 import datetime
 from joblib import Parallel, delayed
 import time
 import json
 
+
 save = False
 
 curve = 'gaussian'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
-# dir = 'data/davide/RankingBandit'+'_'+tail
+dir = '/data/davide/Linear_endless_bandits/'+'_'+tail
 
 os.mkdir(dir)
 dir = dir+'/'
@@ -33,11 +40,11 @@ print("-----------------------------------------------------------\n")
 
 
 env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-T = 1000
+T = 5000
 seeds = 20
 
-policies = [UCB1(len(env.x)), ZOOM(env.x), IGP_UCB(env.x, T, update_every=10)]
-labels = ['UCB1', 'ZOOM', 'IGP-UCB']
+policies = [UCB1(len(env.x)), ZOOM(env.x), Gauss_Bandit(env.x, T)]
+labels = ['UCB1', 'ZOOM', 'GP']
 
 ############# Fourier
 mf = 0.1
@@ -83,7 +90,7 @@ for i in range(len(policies)):
     low, high = bootstrap_ci(results[i])
 
     # make plot
-    plot_data(np.arange(0,T), low, high, col='C{}'.format(i), label=labels[i])
+    # plot_data(np.arange(0,T), low, high, col='C{}'.format(i), label=labels[i])
 
     # save data in given folder
     np.save(dir+labels[i], results[i])
@@ -97,7 +104,7 @@ with open(dir+"parameters.json", "w") as g:
     # Convert the dictionary to a JSON string and write it to the file
     json.dump(parameters, g)
 
-plt.legend()
-plt.title('Regret curves')
-plt.savefig(dir+'regret_plot.pdf')
+# plt.legend()
+# plt.title('Regret curves')
+# plt.savefig(dir+'regret_plot.pdf')
 

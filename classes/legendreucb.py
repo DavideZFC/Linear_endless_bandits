@@ -1,8 +1,13 @@
 from classes.linucb import linUBC
 import numpy as np
-from math import comb
+import math
+# from math import comb
+def comb(n, k):
+    return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
 
 # TODO normalizzare i polinomi in L2
+
+
 
 class LegendreUCB:
     def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False):
