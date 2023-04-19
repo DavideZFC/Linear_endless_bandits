@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm, datasets
 from sklearn.inspection import DecisionBoundaryDisplay
 
-print("hate the rumeno")
+print('csa ca')
 
 # import some data to play with
 iris = datasets.load_iris()
