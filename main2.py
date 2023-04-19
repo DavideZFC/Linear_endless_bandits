@@ -6,6 +6,7 @@ from classes.chebishevucb import ChebishevUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import Gauss_Bandit, GPTS, IGP_UCB
+from classes.baselines.GPUCB import GPUCB
 import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
@@ -18,7 +19,7 @@ import json
 
 save = True
 
-curve = 'poly'
+curve = 'cosine'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -29,7 +30,7 @@ if save:
 env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
-T = 10000
+T = 1000
 seeds = 5
 
 # Fourier parameters
@@ -42,14 +43,14 @@ dl = 6
 
 # Chebishev parameters
 mc = 1.0
-dc = 7
+dc = 6
 
 
 
-policies = [UCB1(len(env.x))]#, FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
-labels = ['UCB1']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), GPUCB(arms=env.x, update_every=2), GPUCB(arms=env.x, update_every=5), GPUCB(arms=env.x, update_every=10), GPUCB(arms=env.x, update_every=20)]#, FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+labels = ['UCB1',  'GPUCB_u.e.2',  'GPUCB_u.e.5',  'GPUCB_u.e.10',  'GPUCB_u.e.20']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
-
+'''
 m_list = [0.1, 1.0]
 d_list = [6, 8]
 lambda_list = [0.1, 1.0]
@@ -58,7 +59,7 @@ for mu in m_list:
         for lam in lambda_list:
             policies.append(ChebishevUCB(env.x, di, lam=lam, T=T, m=mu))
             labels.append('Chebishev_m={}_d={}_lam={}'.format(mu,di,lam))
-
+'''
 
 running_times = {}
 for i in range(len(policies)):
