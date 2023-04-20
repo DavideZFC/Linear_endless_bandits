@@ -9,6 +9,7 @@ from classes.chebishevucb import ChebishevUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import IGP_UCB, Gauss_Bandit
+from classes.baselines.GPUCB import GPUCB
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
@@ -41,10 +42,10 @@ print("-----------------------------------------------------------\n")
 
 
 env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-T = 5000
+T = 10000
 seeds = 20
 
-policies = [UCB1(len(env.x)), ZOOM(env.x), Gauss_Bandit(env.x, T)]
+policies = [UCB1(len(env.x)), ZOOM(env.x), GPUCB(env.x, update_every=20)]
 labels = ['UCB1', 'ZOOM', 'GP']
 
 ############# Fourier
@@ -60,6 +61,14 @@ policies += [LegendreUCB(env.x, dl, T=T, m=ml), LegendreUCB(env.x, dl, T=T, m=ml
 labels += ['LegendreUCB', 'LegendreUCB_even']
 
 parameters = {'mf': mf, 'df': df, 'ml': ml, 'dl': dl}
+
+############# ChebishevUCB
+mc = 1.0
+dc = 6
+policies += [ChebishevUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dl, T=T, m=ml, only_even=True)]
+labels += ['ChebishevUCB', 'ChebishevUCB_even']
+
+parameters = {'mf': mf, 'df': df, 'ml': ml, 'dl': dl, 'mc' : mc, 'dc' : dc}
 
 running_times = {}
 

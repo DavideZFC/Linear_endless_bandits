@@ -1,6 +1,10 @@
 from classes.linucb import linUBC
 import numpy as np
-from math import comb
+import math
+
+# from math import comb
+def comb(n, k):
+    return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
 
 def fatt(n):
     if not type(n)==int:
