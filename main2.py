@@ -19,7 +19,7 @@ import json
 
 save = True
 
-curve = 'cosine'
+curve = 'random'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -30,7 +30,7 @@ if save:
 env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
 env.plot_curve()
 
-T = 1000
+T = 500
 seeds = 5
 
 # Fourier parameters
