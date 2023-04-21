@@ -4,11 +4,21 @@ import numpy as np
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 
-dir = 'results\_23_04_19-14_41_gaussian'
+dir = 'results\_23_04_21-11_33_Xrandom'
 
 with open(dir+"/running_times.json", "r") as f:
     # Convert the dictionary to a JSON string and write it to the file
     running_times = json.load(f)
+
+
+# plot_reward function
+reward_curve = np.load(dir+'/reward_curve.npy')
+x = np.linspace(-1,1,len(reward_curve))
+plt.plot(x, reward_curve, label="reward curve")
+plt.legend()
+plt.savefig(dir+'/reward_curve.pdf')
+plt.show()
+
 
 # makes the barplot
 plt.bar(running_times.keys(), np.log(np.array(list(running_times.values()))))
