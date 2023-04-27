@@ -1,21 +1,51 @@
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import Kernel
+
+class GPR:
+    def __init__(self, kernel, sigma_y=0.01):
+        self.kernel = kernel
+        self.sigma_y = sigma_y
+
+    def fit(self, X, y):
+        self.X_train = X
+        self.y_train = y
+        self.K = self.kernel(X, X)
+        self.K += self.sigma_y**2 * np.eye(X.shape[0])
+        self.L = np.linalg.cholesky(self.K)
+
+    def predict(self, X_test, return_std=True):
+        K_s = self.kernel(self.X_train, X_test)
+        L_inv = np.linalg.solve(self.L, K_s)
+        mu = np.dot(L_inv.T, np.linalg.solve(self.L, self.y_train))
+        var = self.kernel(X_test, X_test) - np.dot(L_inv.T, L_inv) + self.sigma_y**2
+        if return_std:
+            return mu.flatten(), np.diagonal(var)
+        else:
+            return mu.flatten()
+    
+def werner(x1, x2, n=8):
+    # epsilon is added to the diagonal to make it less singular
+
+    d1 = x1.shape[0]
+    d2 = x2.shape[0]
+
+    mat = np.zeros((d1,d2))
+    for i in range(d1):
+        for j in range(d2):
+            if x1[i,0]-x2[j,0]==0:
+                mat[i,j] = n
+            else:
+                delta = x1[i,0]-x2[j,0]
+                mat[i,j] = np.sin(n*delta/2)/np.sin(delta/2)*np.cos((n-1)*delta/2)
+
+    
+    return mat
 
 
 class GPUCB(object):
 
     def __init__(self, arms, beta=100., update_every=10, kernel='gaussian'):
-        '''
-        meshgrid: Output from np.methgrid.
-        e.g. np.meshgrid(np.arange(-1, 1, 0.1), np.arange(-1, 1, 0.1)) for 2D space
-        with |x_i| < 1 constraint.
-        environment: Environment class which is equipped with sample() method to
-        return observed value.
-        beta (optional): Hyper-parameter to tune the exploration-exploitation
-        balance. If beta is large, it emphasizes the variance of the unexplored
-        solution solution (i.e. larger curiosity)
-        '''
+
         self.arms = arms
         self.beta = beta
         self.t = 0
@@ -34,11 +64,7 @@ class GPUCB(object):
         self.y = []
 
     def make_dirichlet_kernel(self):
-        d = 8
-        def dirichlet(x,y):
-            return np.sin((d+0.5)*(x-y))/np.sin((x-y)/2)
-        k = Kernel(dirichlet)
-        return GaussianProcessRegressor(normalize_y=True, kernel=k)
+        return GPR(kernel=werner)
 
 
     def pull_arm(self):
