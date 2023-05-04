@@ -17,7 +17,7 @@ import datetime
 import time
 import json
 
-save = True
+save = False
 
 curve = 'gaussian'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
@@ -26,12 +26,12 @@ dir = 'results/'+'_'+tail+curve
 if save:
     os.mkdir(dir)
     dir = dir+'/'
- 
-env = Lipschitz_Environment(lim=1.0, sigma=0.5, curve = curve, n_arms=100)
-env.plot_curve()
 
-T = 1000
+T = 10000
 seeds = 5
+ 
+env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=int(T**(2/3)))
+env.plot_curve()
 
 # Fourier parameters
 mf = 0.1
@@ -47,8 +47,8 @@ dc = 6
 
 
 
-policies = [UCB1(len(env.x)), GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5)]#, FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
-labels = ['UCB1',  'GPUCB_werner',  'GPUCB']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), LegendreUCB(env.x, dl, T=T, m=ml, exp=1), LegendreUCB(env.x, dl, T=T, m=ml, exp=1), LegendreUCB(env.x, dl, T=T, m=ml, exp=0.75), LegendreUCB(env.x, dl, T=T, m=ml, exp=0.5)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+labels = ['UCB1',  'LegendreUCB',  'LegendreUCB_1', 'LegendreUCB_075', 'LegendreUCB_05']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''
 m_list = [0.1, 1.0]

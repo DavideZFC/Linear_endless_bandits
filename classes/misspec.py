@@ -1,7 +1,7 @@
 import numpy as np
 
-class linUBC:
-    def __init__(self, arms_matrix, lam=0.01, T=1000000.0, m=1, exp=1):
+class misSpec:
+    def __init__(self, arms_matrix, C1=128, sigma=1, lam=1., T=1000000, m=1):
 
         # dimension of the arms
         self.d = arms_matrix.shape[1]
@@ -19,12 +19,19 @@ class linUBC:
         # initialization of the known term b of the system
         self.load = np.zeros(self.d).reshape(-1,1)
 
+        # pulled arms history
+        self.pulled_arms = []
+
         # time horizon
         self.T = T
         self.t = 0
 
+        # constants
+        self.C1 = C1
+        self.sigma = sigma
+
         # error probability
-        self.delta = T**(-exp)
+        self.delta = 1/T
 
         # upper bound on the norm of theta
         self.m = m
@@ -51,11 +58,10 @@ class linUBC:
         self.beta = np.zeros(self.T)
 
         for t in range(self.T):
-            first = self.m * self.lam**0.5
-            second = 2*np.log(1/self.delta) + self.d*np.log((self.d*self.lam+t*self.L**2)/(self.d*self.lam))
-            second = second**0.5
-            # with the notation of Lattimore-Szepesvari, this is beta**0.5
-            self.beta[t] = first + second
+            beta = self.C1*self.sigma**2*self.d*np.log(1+t)*2*np.log(4*(t+1)/(self.delta))
+
+            # this is actually sqrt beta
+            self.beta[t] = beta**0.5
 
     def update(self, arm, reward):
         self.design_matrix += np.matmul(arm.reshape(-1,1),arm.reshape(1,-1))
@@ -93,7 +99,7 @@ class linUBC:
         v_based = np.matmul(matrix, v.reshape(-1,1))
         
         return (np.sum(v_based**2))**0.5
-    
+
 
     def compute_reverse_matrix(self, A):
         def diaginv(A):
@@ -133,12 +139,6 @@ class linUBC:
         thetahat = self.estimate_theta().flatten()
         mat = self.compute_reverse_matrix(self.design_matrix)
 
-        '''
-        for i in range(self.n_arms):
-            estimates[i] = np.dot(thetahat, self.arms[i,:])
-            upper_bound = self.find_maximum(self.design_matrix, self.arms[i])
-            estimates[i] += self.beta[self.t]*upper_bound
-        '''
         estimates = np.matmul(self.arms, thetahat.reshape(-1,1))
         upper_bounds = self.beta[self.t]*np.matmul(self.arms, mat.T)
         a = np.sum(upper_bounds**2, axis = 1)**0.5
@@ -147,7 +147,10 @@ class linUBC:
 
         self.t += 1
 
-        return self.arms[np.argmax(estimates)], np.argmax(estimates)
+        chosen_arm = self.arms[np.argmax(estimates)]
+        self.pulled_arms.append(chosen_arm)
+
+        return chosen_arm, np.argmax(estimates)
 
 
 

@@ -5,9 +5,12 @@ from math import comb
 # TODO normalizzare i polinomi in L2
 
 class LegendreUCB:
-    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False):
+    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False, exp=1):
         # dimension of the problem
         self.d = d
+
+        # exponent for LinUCB
+        self.exp = exp
 
         # arms avaiable
         self.arms = arms
@@ -93,7 +96,7 @@ class LegendreUCB:
 
         # initialize linUCB
         print('Instance linUCB with T='+str(self.T))
-        self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)
+        self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m, exp=self.exp)
 
     def pull_arm(self):
         
