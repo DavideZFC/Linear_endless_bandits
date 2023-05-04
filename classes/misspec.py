@@ -1,7 +1,7 @@
 import numpy as np
 
 class misSpec:
-    def __init__(self, arms_matrix, C1=128, sigma=1, lam=1., T=1000000, m=1):
+    def __init__(self, arms_matrix, C1=128, sigma=1, lam=1., T=1000000, m=1, epsilon=0.01):
 
         # dimension of the arms
         self.d = arms_matrix.shape[1]
@@ -35,6 +35,9 @@ class misSpec:
 
         # upper bound on the norm of theta
         self.m = m
+
+        # misspecification error
+        self.epsilon = epsilon
 
         # maximum norm of an arm vector
         self.L = 0
@@ -144,6 +147,17 @@ class misSpec:
         a = np.sum(upper_bounds**2, axis = 1)**0.5
         a = a.reshape(-1,1)
         estimates += a
+
+        ## fin qui abbiamo le stime con l'upper bound con beta. Manca la parte in cui moltiplichiamo il misspecification upper bound
+        error_term = np.zeros_like(estimates)
+
+        if self.epsilon>0:
+            Ainv = np.linalg.inv(self.design_matrix)
+            for j in range(len(self.pulled_arms)):
+                old_term = np.dot(Ainv,self.pulled_arms[j])
+                error_term += np.abs(np.dot(self.arms, old_term.reshape(-1,1)))
+
+            estimates += self.epsilon*error_term
 
         self.t += 1
 
