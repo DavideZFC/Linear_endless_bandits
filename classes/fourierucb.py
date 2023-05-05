@@ -1,8 +1,9 @@
 from classes.linucb import linUBC
+from classes.misspec import misSpec
 import numpy as np
 
 class FourierUCB:
-    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False):
+    def __init__(self, arms, d, lam=1, T=10000, m=1, only_even=False, miss=False, epsilon=0):
         # dimension of the problem
         self.d = d
 
@@ -17,7 +18,10 @@ class FourierUCB:
         self.even = only_even
 
         # initialize learner
-        self.make_linUCB(lam, m)
+        if miss:
+            self.make_misSpec(lam, m, epsilon)
+        else:
+            self.make_linUCB(lam, m)
 
     def reset(self):
         self.learner.reset()
@@ -56,6 +60,17 @@ class FourierUCB:
 
         # initialize linUCB
         self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)
+
+    def make_misSpec(self, lam, m, epsilon):
+        # prepare feature matrix
+        if self.even:
+            self.make_cosin_arms()
+        else:
+            self.make_sincos_arms()
+
+        # initialize linUCB
+        self.learner = misSpec(self.linUCBarms, lam=lam, T=self.T, m=m, epsilon=epsilon)
+    
 
     def pull_arm(self):
         

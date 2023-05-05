@@ -1,7 +1,7 @@
 import numpy as np
 
 class misSpec:
-    def __init__(self, arms_matrix, C1=128, sigma=1, lam=1., T=1000000, m=1, epsilon=0.01):
+    def __init__(self, arms_matrix, C1=128, sigma=1., lam=1., T=1000000, m=1, epsilon=0.01):
 
         # dimension of the arms
         self.d = arms_matrix.shape[1]
