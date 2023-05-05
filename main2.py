@@ -3,6 +3,7 @@ from classes.lipschitz_env import Lipschitz_Environment
 from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
 from classes.chebishevucb import ChebishevUCB
+from classes.meta_learner import MetaLearner
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import Gauss_Bandit, GPTS, IGP_UCB
@@ -27,10 +28,10 @@ if save:
     os.mkdir(dir)
     dir = dir+'/'
 
-T = 10000
+T = 1000
 seeds = 5
  
-env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=int(T**(2/3)))
+env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=int(T**(1/2)))
 env.plot_curve()
 
 # Fourier parameters
@@ -47,8 +48,8 @@ dc = 6
 
 
 
-policies = [UCB1(len(env.x)), LegendreUCB(env.x, dl, T=T, m=ml, exp=1), LegendreUCB(env.x, dl, T=T, m=ml, exp=1), LegendreUCB(env.x, dl, T=T, m=ml, exp=0.75), LegendreUCB(env.x, dl, T=T, m=ml, exp=0.5)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
-labels = ['UCB1',  'LegendreUCB',  'LegendreUCB_1', 'LegendreUCB_075', 'LegendreUCB_05']#, 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), FourierUCB(env.x, dl, T=T, m=ml), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'FourierUCB2', 'LegendreUCB2', 'ChebishevUCB2']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''
 m_list = [0.1, 1.0]
