@@ -60,7 +60,7 @@ class MetaLearner:
 
     def make_misSpec(self, lam, m, epsilon):
         # initialize linUCB
-        self.learner = misSpec(self.linarms, lam=lam, T=self.T, m=m, epsilon=epsilon)
+        self.learner = misSpec(self.linarms, lam=lam, T=self.T, m=m, epsilon=epsilon, C1=10)
 
 
     def pull_arm(self):        

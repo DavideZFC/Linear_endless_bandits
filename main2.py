@@ -48,7 +48,7 @@ dc = 6
 
 
 
-policies = [UCB1(len(env.x)), FourierUCB(env.x, dl, T=T, m=ml), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+policies = [UCB1(len(env.x)), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf, epsilon=0.1, miss=True), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml, epsilon=0.05, miss=True), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc, epsilon=0.01, miss=True), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
 labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'FourierUCB2', 'LegendreUCB2', 'ChebishevUCB2']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''

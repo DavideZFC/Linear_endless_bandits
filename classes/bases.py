@@ -109,3 +109,19 @@ def make_chebishev_even_arms(n_arms, d, arms):
         linUCBarms[:,j] = np.cos((2*j)*np.arccos(arms))
     
     return linUCBarms
+
+
+def make_poly_arms(n_arms, d, arms):
+    linUCBarms = np.zeros((n_arms, d))
+
+    # build linear features from the arms
+    for j in range(d):
+        
+        # compute degree j legendre polynomial
+        coef = np.zeros(d+1)
+        coef[-1] = 1.
+        
+        # apply polynomial to the arms
+        linUCBarms[:,j] = apply_poly(coef, arms)
+    
+    return linUCBarms
