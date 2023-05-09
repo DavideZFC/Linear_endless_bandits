@@ -2,6 +2,7 @@ from classes.linucb import linUBC
 from classes.misspec import misSpec
 import numpy as np
 from classes.bases import *
+import matplotlib.pyplot as plt
 
 class Bin:
     def __init__(self, start, end, d, arms, T=1000, lam=1., m=1, epsilon=0.01):
@@ -27,10 +28,16 @@ class Bin:
 
         self.make_misSpec()
 
+    def plot_arms(self):
+        for i in range(self.linarms.shape[1]):
+            plt.plot(self.arms[self.first_index : self.last_index], self.linarms[:,i], label='n={}'.format(i))
+        plt.show()
+
 
     def make_misSpec(self):
         # initialize linUCB
-        self.learner = misSpec(self.linarms, lam=self.lam, T=self.T, m=self.m, epsilon=self.epsilon, C1=10)
+        # self.learner = misSpec(self.linarms, lam=self.lam, T=self.T, m=self.m, epsilon=self.epsilon, C1=128)
+        self.learner = linUBC(self.linarms, lam=self.lam, T=self.T, m=self.m)
 
     def pull_arm(self):        
         # ask what arm to pull
@@ -41,7 +48,7 @@ class Bin:
         return self.learner.upper_bound
     
     def update(self, arm, reward):
-        if (self.first_index <= arm ) and (arm <= self.last_index):
+        if (self.first_index <= arm ) and (arm < self.last_index):
             arm = arm - self.first_index
         else:
             return
@@ -64,6 +71,7 @@ class SmoothBins:
         # hyperparameters
         self.lam = lam
         self.m = m
+        self.epsilon = epsilon
 
         # time horizon
         self.T = T
@@ -76,12 +84,14 @@ class SmoothBins:
         # instantiate learner for each bin
         self.learners = []
 
+        self.pulled_arms = np.zeros(self.n_arms)
+
         # make the arms
         idx_start = 0
         bin_end = 1
         for i in range(self.n_arms):
             if self.arms[i] > self.bin_delimiter[bin_end]:
-                self.learners.append(Bin(idx_start, i, self.d, self.arms, T=self.T, m=self.m, lam=self.lam))
+                self.learners.append(Bin(idx_start, i, self.d, self.arms, T=self.T, m=self.m, lam=self.lam, epsilon=self.epsilon))
                 bin_end += 1
                 idx_start = i
         # create last bin
@@ -89,7 +99,8 @@ class SmoothBins:
 
     def reset(self):
         ''' re-create the bins, one by one'''
-
+        self.t = 0
+        self.pulled_arms = np.zeros(self.n_arms)
         self.learners = []
 
         # make the arms
@@ -104,9 +115,12 @@ class SmoothBins:
         self.learners.append(Bin(idx_start, self.n_arms, self.d, self.arms, T=self.T, m=self.m, lam=self.lam))
 
     def pull_arm(self):
+        warmup = 10
 
-        if self.t < self.bins:
-            arm = self.learners[self.t].pull_arm()
+        if self.t < self.bins*warmup:
+            arm = self.learners[self.t%self.bins].pull_arm()
+            self.pulled_arms[arm] += 1
+            self.t += 1
             return arm
     
         else:
@@ -117,6 +131,8 @@ class SmoothBins:
 
             best_bin = np.argmax(upper_bounds)
             arm = self.learners[best_bin].pull_arm()
+            self.pulled_arms[arm] += 1
+            self.t += 1
             return arm
         
     def update(self, arm, reward):

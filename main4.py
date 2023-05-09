@@ -29,10 +29,8 @@ env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=int(T**(1/
 env.plot_curve()
 
 
-policies = [SmoothBins(env.x, d=3, bins=5, T=T), UCB1(len(env.x))]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+policies = [SmoothBins(env.x, d=5, bins=5, T=T, m=2, lam=1, epsilon=0.0), UCB1(len(env.x))]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
 labels = ['SmoothBins', 'UCB1']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
-
-
 
 running_times = {}
 for i in range(len(policies)):
@@ -42,9 +40,13 @@ for i in range(len(policies)):
 
     # test the algorithm
     regret = test_algorithm(policies[i], env, T, seeds)
+    # plt.hist(policies[0].pulled_arms)
+    # plt.show()
+    print(policies[0].pulled_arms)
 
     # save regret matrix
-    np.save(dir+labels[i], regret)
+    if save:
+        np.save(dir+labels[i], regret)
 
     # store time
     t1 = time.time()

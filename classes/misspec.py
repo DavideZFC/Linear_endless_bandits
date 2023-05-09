@@ -66,6 +66,8 @@ class misSpec:
             # this is actually sqrt beta
             self.beta[t] = beta**0.5
 
+        print('Beta routine :'+str(self.beta))
+
     def update(self, arm, reward):
         self.design_matrix += np.matmul(arm.reshape(-1,1),arm.reshape(1,-1))
         self.load += reward*arm.reshape(-1,1)
