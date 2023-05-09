@@ -41,6 +41,9 @@ class MetaLearner:
                 self.linarms = make_chebishev_arms(self.n_arms, d, arms)
             print('Chebishev basis init')  
 
+        elif basis == 'Poly':
+            self.linarms = make_poly_arms(self.n_arms, d, arms)
+
         else:
             raise Exception("Sorry, basis not found")
 
@@ -59,7 +62,7 @@ class MetaLearner:
         self.learner = linUBC(self.linarms, lam=lam, T=self.T, m=m)
 
     def make_misSpec(self, lam, m, epsilon):
-        # initialize linUCB
+        # initialize misslinUCB
         self.learner = misSpec(self.linarms, lam=lam, T=self.T, m=m, epsilon=epsilon, C1=10)
 
 

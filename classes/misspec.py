@@ -159,6 +159,9 @@ class misSpec:
 
             estimates += self.epsilon*error_term
 
+        # in this way, we have an upper bound for the maximal reward that we expect
+        self.upper_bound = np.max(estimates)
+
         self.t += 1
 
         chosen_arm = self.arms[np.argmax(estimates)]
