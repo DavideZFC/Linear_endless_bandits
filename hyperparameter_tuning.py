@@ -8,6 +8,7 @@ from functions.plot_from_dataset import plot_data
 import os
 
 import datetime
+from joblib import Parallel, delayed
 import time
 import json
 
@@ -43,6 +44,10 @@ for basis in bases:
 
             policy = MetaLearner(basis=basis, arms=env.x, d=d, T=T, m=m)
             regret = test_algorithm(policy, env, T, seeds)
+
+            results = Parallel(n_jobs=seeds)(delayed(test_algorithm)(policy, env, T, seeds=1, first_seed=seed) for seed in range(seeds))
+            regret = np.concatenate(results, axis=0)
+
             mean_regret = np.mean(regret[:,-1])
 
             param_dic[key] = mean_regret

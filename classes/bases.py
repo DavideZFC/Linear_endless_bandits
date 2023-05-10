@@ -1,5 +1,8 @@
 import numpy as np
-from math import comb
+import math
+
+def comb(n, k):
+    return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
 
 
 def make_cosin_arms(n_arms, d, arms):
