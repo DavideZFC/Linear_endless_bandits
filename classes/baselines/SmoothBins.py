@@ -36,8 +36,10 @@ class Bin:
 
     def make_misSpec(self):
         # initialize linUCB
-        # self.learner = misSpec(self.linarms, lam=self.lam, T=self.T, m=self.m, epsilon=self.epsilon, C1=128)
-        self.learner = linUBC(self.linarms, lam=self.lam, T=self.T, m=self.m)
+        if self.epsilon > 0:
+            self.learner = misSpec(self.linarms, lam=self.lam, T=self.T, m=self.m, epsilon=self.epsilon, C1=128)
+        else:
+            self.learner = linUBC(self.linarms, lam=self.lam, T=self.T, m=self.m)
 
     def pull_arm(self):        
         # ask what arm to pull
@@ -77,8 +79,8 @@ class SmoothBins:
         self.T = T
         self.t = 0
 
-        # bins
-        self.bins = bins
+        # bins (impossible to have less bins than arms)
+        self.bins = min(bins,len(arms))
         self.bin_delimiter = np.linspace(-1,1,self.bins+1)
 
         # instantiate learner for each bin

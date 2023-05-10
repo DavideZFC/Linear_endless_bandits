@@ -34,7 +34,7 @@ class linUBC:
         for i in range(self.arms.shape[0]):
             self.L = max(self.L,self.norm(self.arms[i,:]))
         
-        print('Highest norm estimated {}'.format(self.L))
+        # print('Highest norm estimated {}'.format(self.L))
 
         self.compute_beta_routine()
 

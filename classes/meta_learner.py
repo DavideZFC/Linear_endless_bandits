@@ -25,21 +25,18 @@ class MetaLearner:
                 self.linarms = make_cosin_arms(self.n_arms, d, arms)
             else:
                 self.linarms = make_sincos_arms(self.n_arms, d, arms)
-            print('Fourier basis init')
 
         elif basis == 'Legendre':
             if only_even:
                 self.linarms = make_legendre_even_arms(self.n_arms, d, arms)
             else:
                 self.linarms = make_legendre_arms(self.n_arms, d, arms)
-            print('Legendre basis init')
 
         elif basis == 'Chebishev':
             if only_even:
                 self.linarms = make_chebishev_even_arms(self.n_arms, d, arms)
             else:
                 self.linarms = make_chebishev_arms(self.n_arms, d, arms)
-            print('Chebishev basis init')  
 
         elif basis == 'Poly':
             self.linarms = make_poly_arms(self.n_arms, d, arms)
