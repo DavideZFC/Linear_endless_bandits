@@ -4,7 +4,7 @@ import numpy as np
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 
-dir = 'results\_23_04_21-11_33_Xrandom'
+dir = 'results\_23_05_11-10_52_Yrandom'
 
 with open(dir+"/running_times.json", "r") as f:
     # Convert the dictionary to a JSON string and write it to the file
