@@ -18,9 +18,9 @@ import datetime
 import time
 import json
 
-save = False
+save = True
 
-curve = 'gaussian'
+curve = 'even_poly'
 tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
 dir = 'results/'+'_'+tail+curve
 
@@ -28,8 +28,8 @@ if save:
     os.mkdir(dir)
     dir = dir+'/'
 
-T = 1000
-seeds = 5
+T = 10000
+seeds = 20
  
 env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=int(T**(1/2)))
 env.plot_curve()
@@ -48,8 +48,8 @@ dc = 6
 
 
 
-policies = [UCB1(len(env.x)), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf, epsilon=0.1, miss=True), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml, epsilon=0.05, miss=True), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc, epsilon=0.01, miss=True), MetaLearner(basis='Fourier', arms=env.x, d=df, T=T, m=mf), MetaLearner(basis='Legendre', arms=env.x, d=dl, T=T, m=ml), MetaLearner(basis='Chebishev', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
-labels = ['UCB1', 'FourierUCB', 'LegendreUCB', 'ChebishevUCB', 'FourierUCB2', 'LegendreUCB2', 'ChebishevUCB2']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
+policies = [UCB1(len(env.x)), LegendreUCB(arms=env.x, d=dl, T=T, m=ml), ChebishevUCB(arms=env.x, d=dc, T=T, m=mc), MetaLearner(basis='Poly', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+labels = ['UCB1', 'LegendreUCB', 'ChebishevUCB', 'PolyUCB']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''
 m_list = [0.1, 1.0]
