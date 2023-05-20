@@ -95,7 +95,6 @@ class LegendreUCB:
             self.make_legendre_arms()
 
         # initialize linUCB
-        print('Instance linUCB with T='+str(self.T))
         self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m, exp=self.exp)
 
     def pull_arm(self):

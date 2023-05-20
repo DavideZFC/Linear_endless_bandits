@@ -25,7 +25,6 @@ class Bin:
         # print('Bin created with arms')
         # print(self.arms[start : end])
         reference_arms = self.arms[(len(self.arms)-self.n_my_arms)//2:(len(self.arms)+self.n_my_arms)//2]
-        print(reference_arms)
         self.linarms = make_poly_arms(self.n_my_arms, self.d, reference_arms)
 
         self.make_misSpec()

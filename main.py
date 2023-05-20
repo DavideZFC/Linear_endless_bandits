@@ -1,58 +1,136 @@
 import numpy as np
-from classes.environment import Environment
-from classes.misspec import misSpec
-from classes.linucb import linUBC
+from classes.lipschitz_env import Lipschitz_Environment
+from classes.fourierucb import FourierUCB
+from classes.legendreucb import LegendreUCB
+from classes.chebishevucb import ChebishevUCB
+from classes.baselines.learners import UCB1
+from classes.baselines.lips_learners import ZOOM
+from classes.baselines.advanced_learners import IGP_UCB
+from classes.baselines.SmoothBins import SmoothBins
 import matplotlib.pyplot as plt
+from functions.test_algorithm import test_algorithm
+from functions.confidence_bounds import bootstrap_ci
+from functions.plot_from_dataset import plot_data
+import os
 
+import datetime
+from joblib import Parallel, delayed
 import time
+import json
+
+save = True
+
+print('Which experiment (a,b,c,d) to perform?')
+e = input()
+if e == 'a':
+    curve = 'gaussian'
+elif e == 'b':
+    curve = 'even_poly'
+elif e == 'c':
+    curve = 'sin-like'
+elif e == 'd':
+    curve = 'spike'
+else:
+    raise Exception("Environment not supported")
+
+print('Do you want to use even basis function? y/n')
+only_even = input()
+only_even = (only_even == 'y')
+
+tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
+dir = 'results/'+'_'+tail+curve
+
+os.mkdir(dir)
+dir = dir+'/'
 
 
-d = 5
-n_arms = 100
+print("-----------------------------------------------------------\n")
+print("Orthogonal Function Representations for Continuous Armed Bandits on Synthetic Data\n")
+print("-----------------------------------------------------------\n")
+
+
+env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
 T = 1000
-m = 100
-theta = np.array([0.9, -1., 1., -1., 1.1])
+seeds = 5
 
-env = Environment(theta, sd=0.1, epsilon=0.1)
+policies = [ZOOM(env.x), IGP_UCB(env.x, T, update_every=10), SmoothBins(env.x, d=5, bins=5, T=T, m=2, lam=1, epsilon=0.1)]
+labels = ['ZOOM', 'GP', 'UMA']
 
-arms = np.random.normal(size=(n_arms,d))
-policy = linUBC(arms_matrix=arms, T=T, m=m)
-opt = env.get_optimum(arms)
+############# Fourier
+mf = 0.1
+df = 8
+policies += [FourierUCB(env.x, df, T, m=mf, only_even=only_even)]
+if only_even:
+    labels += ['FourierUCB+E']
+else:
+    labels += ['FourierUCB']
 
-reward_vector = np.zeros(T)
+############# Legendre
+ml = 1.0
+dl = 6
+policies += [LegendreUCB(env.x, dl, T=T, m=ml, only_even=only_even)]
+if only_even:
+    labels += ['LegendreUCB+E']
+else:
+    labels += ['LegendreUCB']
 
-# measure time of LinUCB
-start = time.time()
+############# Chebyshev
+ml = 1.0
+dl = 6
+policies += [ChebishevUCB(env.x, dl, T=T, m=ml, only_even=only_even)]
+if only_even:
+    labels += ['ChebyshevUCB+E']
+else:
+    labels += ['ChebyshevUCB']
 
-for t in range(T):
-    arm, _ = policy.pull_arm()
-    reward = env.pull_arm(arm)
-    reward_vector[t] = reward
-    policy.update(arm, reward)
+parameters = {'mf': mf, 'df': df, 'ml': ml, 'dl': dl}
 
-end = time.time()
+running_times = {}
 
-print('Tempo trascorso linUCB = {}'.format(end-start))
+results = [] 
 
-policy = misSpec(arms_matrix=arms, T=T, epsilon=0.1, sigma=0.1, C1=10)# il problema è ovviamente il C
-reward_vector2 = np.zeros(T)
+for i in range(len(policies)):
 
-# measure time of Misspec
-start = time.time()
+    ####################################
+    # actual algorithm simulation
 
-for t in range(T):
-    arm, _ = policy.pull_arm()
-    reward = env.pull_arm(arm)
-    reward_vector2[t] = reward
-    policy.update(arm, reward)
+    # evaluate running time of the algorithm
+    t0 = time.time()
 
-end = time.time()
-print('Tempo trascorso misSPEC = {}'.format(end-start))
+    # test the algorithm
+    results.append(Parallel(n_jobs=seeds)(delayed(test_algorithm)(policies[i], env, T, seeds=1, first_seed=seed) for seed in range(seeds)))
+
+    # store time
+    t1 = time.time()
+    running_times[labels[i]] = t1 - t0
+    
+    print(labels[i] + ' finished')
+
+    ####################################
+    # part to save data
+
+    results[i] = np.concatenate(results[i], axis=0)
+
+    # make nonparametric confidence intervals
+    low, high = bootstrap_ci(results[i])
+
+    # make plot
+    plot_data(np.arange(0,T), low, high, col='C{}'.format(i), label=labels[i])
+
+    # save data in given folder
+    np.save(dir+labels[i], results[i])
 
 
+with open(dir+"running_times.json", "w") as f:
+    # Convert the dictionary to a JSON string and write it to the file
+    json.dump(running_times, f)
 
-plt.plot(reward_vector, label='LinUCB')
-plt.plot(reward_vector2, label='misSPEC')
-plt.axhline(y=opt, color = 'C1', linestyle='dashed')
+with open(dir+"parameters.json", "w") as g:
+    # Convert the dictionary to a JSON string and write it to the file
+    json.dump(parameters, g)
+
 plt.legend()
+plt.title('Regret curves')
+plt.savefig(dir+'regret_plot.pdf')
 plt.show()
+

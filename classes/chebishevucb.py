@@ -60,7 +60,6 @@ class ChebishevUCB:
             self.make_chebishev_arms()
 
         # initialize linUCB
-        print('Instance linUCB with T='+str(self.T))
         self.learner = linUBC(self.linUCBarms, lam=lam, T=self.T, m=m)
 
     def pull_arm(self):
