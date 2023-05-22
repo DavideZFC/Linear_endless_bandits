@@ -7,7 +7,7 @@ from classes.meta_learner import MetaLearner
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.advanced_learners import Gauss_Bandit, GPTS, IGP_UCB
-from classes.baselines.GPUCB import GPUCB
+from classes.baselines.IGPUCB import GPUCB
 import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
@@ -48,7 +48,9 @@ dc = 6
 
 
 
-policies = [UCB1(len(env.x)), LegendreUCB(arms=env.x, d=dl, T=T, m=ml), ChebishevUCB(arms=env.x, d=dc, T=T, m=mc), MetaLearner(basis='Poly', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True), ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
+policies = [UCB1(len(env.x)), LegendreUCB(arms=env.x, d=dl, T=T, m=ml), ChebishevUCB(arms=env.x, d=dc, T=T, m=mc), MetaLearner(basis='Poly', arms=env.x, d=dc, T=T, m=mc)]#,GPUCB(arms=env.x, update_every=5, kernel='dirichlet'), 
+#GPUCB(arms=env.x, update_every=5), FourierUCB(env.x, df, T, m=mf), LegendreUCB(env.x, dl, T=T, m=ml), ChebishevUCB(env.x, dc, T=T, m=mc), FourierUCB(env.x, df, T, m=mf, only_even=True), LegendreUCB(env.x, dl, T=T, m=ml, only_even=True),
+#ChebishevUCB(env.x, dc, T=T, m=mc, only_even=True)] 
 labels = ['UCB1', 'LegendreUCB', 'ChebishevUCB', 'PolyUCB']#,  'LegendreUCB', 'EvenFourier', 'EvenLegendre', 'EvenChebishev']#, 'ZOOM', 'GPTS', 'GaussUCB', 
 
 '''

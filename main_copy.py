@@ -5,7 +5,8 @@ from classes.legendreucb import LegendreUCB
 from classes.chebishevucb import ChebishevUCB
 from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
-from classes.baselines.IGPUCB import IGPUCB
+from classes.baselines.advanced_learners import IGP_UCB
+from classes.baselines.IGPUCB import GPUCB,IGPUCB
 from classes.baselines.UCBMetaAlgorithm import UCBMetaAlgorithm
 import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
@@ -50,40 +51,13 @@ print("-----------------------------------------------------------\n")
 
 
 env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-T = 1000
-seeds = 5
+T = 500
+seeds = 2
 
-policies = [ZOOM(env.x), IGPUCB(env.x, T, B=4, R=1, update_every=10), UCBMetaAlgorithm(env.x, d=5, bins=5, T=T, m=2, lam=1, epsilon=0.1)]
-labels = ['ZOOM', 'GP', 'UMA']
+policies = [IGPUCB(env.x, T, update_every=10), GPUCB(arms=env.x, update_every=10)]
+labels = ['IGP', 'GP']
 
-############# Fourier
-mf = 0.1
-df = 8
-policies += [FourierUCB(env.x, df, T, m=mf, only_even=only_even)]
-if only_even:
-    labels += ['FourierUCB+E']
-else:
-    labels += ['FourierUCB']
 
-############# Legendre
-ml = 1.0
-dl = 6
-policies += [LegendreUCB(env.x, dl, T=T, m=ml, only_even=only_even)]
-if only_even:
-    labels += ['LegendreUCB+E']
-else:
-    labels += ['LegendreUCB']
-
-############# Chebyshev
-ml = 1.0
-dl = 6
-policies += [ChebishevUCB(env.x, dl, T=T, m=ml, only_even=only_even)]
-if only_even:
-    labels += ['ChebyshevUCB+E']
-else:
-    labels += ['ChebyshevUCB']
-
-parameters = {'mf': mf, 'df': df, 'ml': ml, 'dl': dl}
 
 running_times = {}
 
@@ -125,9 +99,6 @@ with open(dir+"running_times.json", "w") as f:
     # Convert the dictionary to a JSON string and write it to the file
     json.dump(running_times, f)
 
-with open(dir+"parameters.json", "w") as g:
-    # Convert the dictionary to a JSON string and write it to the file
-    json.dump(parameters, g)
 
 plt.legend()
 plt.title('Regret curves')

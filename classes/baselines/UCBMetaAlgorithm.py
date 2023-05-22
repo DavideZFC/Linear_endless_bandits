@@ -62,7 +62,7 @@ class Bin:
 
 
 
-class SmoothBins:
+class UCBMetaAlgorithm:
     def __init__(self, arms, d, bins, lam=1, T=10000, m=1, epsilon=0):
         # dimension of the problem
         self.d = d

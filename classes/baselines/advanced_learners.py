@@ -45,7 +45,7 @@ class IGP_UCB():
     '''
     From the article "On Kernelized Multi-armed Bandits"
     '''
-    def __init__(self, arms, T=10000, B=10, R=1, update_every=50, warmup=10):
+    def __init__(self, arms, T=10000, B=4, R=1, update_every=50, warmup=10):
         '''
         arms = arms of the environment
         '''
@@ -60,25 +60,29 @@ class IGP_UCB():
         self.delta = 1/T
         self.B = B
         self.R = R
+        self.mu = np.zeros(len(self.arms))
+        self.sigma = np.ones(len(self.arms))
         self.warmup_steps = warmup
 
     def pull_arm(self):
         self.step += 1
-        if self.step < self.warmup_steps:
-            return np.random.randint(self.N)
-        else:
-            mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
-            gamma = np.log(self.step)**2
-            beta = self.B + self.R*np.sqrt(2*gamma + 1 + np.log(1/self.delta))
-            return np.argmax(mean + beta*std)
+        gamma = np.log(self.step)**2
+        beta = self.B + self.R*np.sqrt(2*gamma + 1 + np.log(1/self.delta))
+        if self.step == 10:
+            print('beta 50 {}'.format(beta))
+        if self.step % self.update_every == 0:
+            self.mu, self.sigma = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+        return np.argmax(self.mu + beta*self.sigma)
 
     def update(self, arm, reward):
         self.eval_x.append(self.arms[arm])
         self.eval_y.append(reward)
-        if (self.step > 10 and self.step % self.update_every == self.update_every-1):
-            self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
+        if self.step == 50:
+            print(self.eval_x)
 
-    def reset(self):     
+    def reset(self): 
+        self.mu = np.zeros(len(self.arms))
+        self.sigma = np.ones(len(self.arms)) 
         self.eval_x = []
         self.eval_y = []
         self.gp = GaussianProcessRegressor(normalize_y=True)
@@ -115,6 +119,7 @@ class GPTS():
             return self.step
         else:
             if(self.step % self.update_every == 0):
+                self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
                 self.means, self.stds = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
             samples = self.stds*np.random.randn(self.N)+self.means
             return np.argmax(samples)
@@ -122,9 +127,7 @@ class GPTS():
     def update(self, arm, reward):
         self.eval_x.append(self.arms[arm])
         self.eval_y.append(reward)
-        if (self.step > 10 and self.step % self.update_every==self.update_every-1):
-            self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
-
+        
     def reset(self):     
         self.eval_x = []
         self.eval_y = []

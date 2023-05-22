@@ -42,12 +42,16 @@ def werner(x1, x2, n=8):
     return mat
 
 
-class GPUCB(object):
 
-    def __init__(self, arms, beta=100., update_every=10, kernel='gaussian'):
+class IGPUCB(object):
+
+    def __init__(self, arms, T=10000, B=4, R=1, update_every=10, kernel='gaussian'):
 
         self.arms = arms
-        self.beta = beta
+        self.T = T
+        self.delta = 1/T
+        self.B = B
+        self.R = R
         self.t = 0
         self.kernel = kernel
         if self.kernel == 'gaussian':
@@ -87,7 +91,10 @@ class GPUCB(object):
 
 
     def argmax_ucb(self):
-        return np.argmax(self.mu + self.sigma * np.sqrt(self.beta))
+        gamma = np.log(self.t)**2
+        beta = self.B + self.R*np.sqrt(2*gamma + 1 + np.log(1/self.delta))
+
+        return np.argmax(self.mu + self.sigma * np.sqrt(beta))
   
     def update(self, arm, reward):
         self.X.append(self.arms[arm])
