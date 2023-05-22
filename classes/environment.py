@@ -1,6 +1,9 @@
 import numpy as np
 
 class Environment:
+    '''
+    Environment to use linear bandit algorithms, no related so smooth bandits
+    '''
     def __init__(self, theta, sd=0.1, epsilon=0):
         self.theta = theta
         self.sd = sd

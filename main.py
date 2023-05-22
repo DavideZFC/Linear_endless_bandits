@@ -3,6 +3,7 @@ from classes.lipschitz_env import Lipschitz_Environment
 from classes.fourierucb import FourierUCB
 from classes.legendreucb import LegendreUCB
 from classes.chebishevucb import ChebishevUCB
+from classes.baselines.learners import UCB1
 from classes.baselines.lips_learners import ZOOM
 from classes.baselines.IGPUCB import IGPUCB
 from classes.baselines.UCBMetaAlgorithm import UCBMetaAlgorithm
@@ -52,7 +53,7 @@ env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
 T = 1000
 seeds = 5
 
-policies = [ZOOM(env.x), IGPUCB(env.x, T, B=4, R=1, update_every=10), UCBMetaAlgorithm(env.x, d=5, bins=5, T=T, m=2, lam=1, epsilon=0.1)]
+policies = [ZOOM(env.x), IGPUCB(env.x, T,B=4, R=1, update_every=10), UCBMetaAlgorithm(env.x, d=5, bins=5, T=T, m=2, lam=1, epsilon=0.1)]
 labels = ['ZOOM', 'GP', 'UMA']
 
 ############# Fourier
