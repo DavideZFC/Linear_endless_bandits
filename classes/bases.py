@@ -30,7 +30,7 @@ def make_sincos_arms(n_arms, d, arms):
             linUCBarms[:,j] = np.cos(np.pi*eta*arms)
 
     return linUCBarms
-    
+
 
 def apply_poly(coef, x):
     ''' Returns the result gotten by applying a poplynomial with given coefficients to
@@ -54,6 +54,13 @@ def apply_poly(coef, x):
     return np.matmul(x_pow, coef.reshape(-1,1)).reshape(-1)
 
 
+def computeL2(coef):
+    N = 1000
+    x = np.linspace(-1,1,N)
+    y = apply_poly(coef, x)
+
+    return (2*np.mean(y**2))**0.5
+
 def get_legendre_poly(n):
     ''' get the coefficients of the n-th legendre polynomial'''
 
@@ -61,6 +68,16 @@ def get_legendre_poly(n):
     for k in range(int(n/2)+1):
         coef[n-2*k] = (-1)**k * 2**(-n) * comb(n, k) * comb (2*n-2*k, n)
     return coef
+
+
+def get_legendre_norm_poly(n):
+    ''' get the coefficients of the n-th legendre polynomial'''
+
+    coef = np.zeros(n+1)
+    for k in range(int(n/2)+1):
+        coef[n-2*k] = (-1)**k * 2**(-n) * comb(n, k) * comb (2*n-2*k, n)
+    
+    return coef/computeL2(coef)
 
 
 
@@ -72,6 +89,21 @@ def make_legendre_arms(n_arms, d, arms):
         
         # compute degree j legendre polynomial
         coef = get_legendre_poly(j)
+        
+        # apply polynomial to the arms
+        linUCBarms[:,j] = apply_poly(coef, arms)
+    
+    return linUCBarms
+
+
+def make_legendre_norm_arms(n_arms, d, arms):
+    linUCBarms = np.zeros((n_arms, d))
+
+    # build linear features from the arms
+    for j in range(d):
+        
+        # compute degree j legendre polynomial
+        coef = get_legendre_norm_poly(j)
         
         # apply polynomial to the arms
         linUCBarms[:,j] = apply_poly(coef, arms)

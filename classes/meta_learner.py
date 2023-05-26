@@ -38,6 +38,9 @@ class MetaLearner:
             else:
                 self.linarms = make_chebishev_arms(self.n_arms, d, arms)
 
+        elif basis == 'Legendre_norm':
+            self.linarms = make_legendre_norm_arms(self.n_arms, d, arms)
+
         elif basis == 'Poly':
             self.linarms = make_poly_arms(self.n_arms, d, arms)
 
