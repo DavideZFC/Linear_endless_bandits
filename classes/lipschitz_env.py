@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from functions.critical_poly import critical_poly
 
 class Lipschitz_Environment:
     '''
@@ -106,6 +107,11 @@ class Lipschitz_Environment:
                     self.y[i] = abs(spike_par - abs(self.x[i]-mean_x))
                 elif(self.x[i] > mean_x):
                     self.y[i] = eta*spike_par
+        
+        elif curve == 'critical_poly':
+            self.y = critical_poly(self.x)
+
+        self.plot_curve()
 
 
     def pull_arm(self, arm):
