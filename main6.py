@@ -21,7 +21,6 @@ class Experiment(object):
         # curve = 'critical_poly'
         tail = datetime.datetime.now().strftime("%y_%m_%d-%H_%M_")
         dir = 'results/'+'_'+tail+curve
-        # dir = 'data/davide/RankingBandit'+'_'+tail
 
         os.mkdir(dir)
         dir = dir+'/'
@@ -30,6 +29,8 @@ class Experiment(object):
         env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
         T = 10000
         seeds = 20
+        # save reward curve
+        np.save(dir+'reward_curve', env.y)
 
         dp = 9
 
