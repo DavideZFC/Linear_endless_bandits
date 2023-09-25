@@ -84,7 +84,61 @@ class IGP_UCB():
         self.gp = GaussianProcessRegressor(normalize_y=True)
         self.step = 0
 
+class BPE():
+    '''
+    From the article "Gaussian Process Bandit Optimization with Few Batches"
+    '''
+    def __init__(self, arms, T=10000, B=10, R=1):
+        '''
+        arms = arms of the environment
+        '''
+        self.arms = arms
+        self.active_arms = np.ones_like(arms)
+        self.N = len(arms)
+        self.eval_x = []
+        self.eval_y = []
+        self.gp = GaussianProcessRegressor(normalize_y=True)
+        self.step = 0
+        self.T = T
+        self.delta = 1/T
+        self.B = B
+        self.R = R
+        self.next_lim = int(np.sqrt(T))
 
+    def pull_arm(self):
+        # we throw away the mean and maximize the variance
+        _, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+        
+        # we put to zero the variance of arms that are not active
+        std = std*self.active_arms
+
+        return np.argmax(std)
+
+    def update(self, arm, reward):
+        self.eval_x.append(self.arms[arm])
+        self.eval_y.append(reward)
+        self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
+
+        self.step += 1
+
+        if self.step == self.next_lim:
+
+            self.next_lim = int(np.sqrt(self.next_lim*self.T))
+
+            # compute LB
+            mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+
+            # update set of active arms
+            self.active_arms = np.array([1 if UB > 0 else 0 for num in self.arms])
+
+
+    
+    def reset(self):  
+        self.active_arms = np.ones_like(np.arms)  
+        self.eval_x = []
+        self.eval_y = []
+        self.gp = GaussianProcessRegressor(normalize_y=True)
+        self.step = 0
 
 class GPTS():
     '''

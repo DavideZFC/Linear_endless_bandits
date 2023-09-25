@@ -23,6 +23,7 @@ def critical_poly(x ,d=9):
 
     # same polynomial in the two bases
     coef_ = np.dot(mat,u)
+    print(np.round(coef_,3)/2.5)
 
     y = apply_poly(coef_, x)
     return -y
