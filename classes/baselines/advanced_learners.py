@@ -88,7 +88,7 @@ class BPE():
     '''
     From the article "Gaussian Process Bandit Optimization with Few Batches"
     '''
-    def __init__(self, arms, T=10000, B=10, R=1):
+    def __init__(self, arms, T=10000, Psi=10, R=1, lam=1):
         '''
         arms = arms of the environment
         '''
@@ -101,8 +101,9 @@ class BPE():
         self.step = 0
         self.T = T
         self.delta = 1/T
-        self.B = B
+        self.Psi = Psi
         self.R = R
+        self.lam = lam
         self.next_lim = int(np.sqrt(T))
 
     def pull_arm(self):
@@ -125,16 +126,19 @@ class BPE():
 
             self.next_lim = int(np.sqrt(self.next_lim*self.T))
 
-            # compute LB
+            # compute UB and LB
             mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+            beta = self.Psi + self.R/np.sqrt(self.lam)*np.sqrt(2*np.log(self.N*self.next_lim/self.delta))
+            UBvector = mean + beta*std
+            LB = np.max(mean - beta*std)
 
             # update set of active arms
-            self.active_arms = np.array([1 if UB > 0 else 0 for num in self.arms])
+            self.active_arms *= np.where(UBvector > LB, 1, 0)
 
 
     
     def reset(self):  
-        self.active_arms = np.ones_like(np.arms)  
+        self.active_arms = np.ones_like(self.arms)  
         self.eval_x = []
         self.eval_y = []
         self.gp = GaussianProcessRegressor(normalize_y=True)
