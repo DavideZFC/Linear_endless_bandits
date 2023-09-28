@@ -1,5 +1,5 @@
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, DotProduct, WhiteKernel, ConstantKernel as C
+from sklearn.gaussian_process.kernels import RBF, DotProduct, WhiteKernel, ConstantKernel
 import numpy as np
 
 class Gauss_Bandit():
@@ -45,7 +45,7 @@ class IGP_UCB():
     '''
     From the article "On Kernelized Multi-armed Bandits"
     '''
-    def __init__(self, arms, T=10000, B=10, R=1, update_every=50, warmup=10):
+    def __init__(self, arms, T=10000, B=10, R=1, update_every=50, warmup=1):
         '''
         arms = arms of the environment
         '''
@@ -68,6 +68,7 @@ class IGP_UCB():
             return np.random.randint(self.N)
         else:
             mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+            # print('step {} maximal std: {} minimal std: {}'.format(self.step ,np.max(std), np.min(std)))
             gamma = np.log(self.step)**2
             beta = self.B + self.R*np.sqrt(2*gamma + 1 + np.log(1/self.delta))
             return np.argmax(mean + beta*std)
@@ -97,7 +98,7 @@ class BPE():
         self.N = len(arms)
         self.eval_x = []
         self.eval_y = []
-        self.gp = GaussianProcessRegressor(normalize_y=True)
+        self.gp = GaussianProcessRegressor(normalize_y=True)#, kernel = WhiteKernel() + ConstantKernel(1.0, constant_value_bounds="fixed") * RBF(1.0, length_scale_bounds="fixed"))
         self.step = 0
         self.T = T
         self.delta = 1/T
@@ -109,6 +110,7 @@ class BPE():
     def pull_arm(self):
         # we throw away the mean and maximize the variance
         _, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
+        # print('step {} maximal std: {} minimal std: {} number of active arms: {}'.format(self.step ,np.max(std), np.min(std), np.sum(np.sum(self.active_arms))))
         
         # we put to zero the variance of arms that are not active
         std = std*self.active_arms
@@ -118,12 +120,11 @@ class BPE():
     def update(self, arm, reward):
         self.eval_x.append(self.arms[arm])
         self.eval_y.append(reward)
-        self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
 
         self.step += 1
 
         if self.step == self.next_lim:
-
+            self.gp.fit(np.array(self.eval_x).reshape(-1, 1), np.array(self.eval_y))
             self.next_lim = int(np.sqrt(self.next_lim*self.T))
 
             # compute UB and LB
