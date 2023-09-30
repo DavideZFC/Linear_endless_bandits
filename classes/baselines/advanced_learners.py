@@ -131,10 +131,11 @@ class BPE():
             mean, std = self.gp.predict(self.arms.reshape(-1,1), return_std = True)
             beta = self.Psi + self.R/np.sqrt(self.lam)*np.sqrt(2*np.log(self.N*self.next_lim/self.delta))
             UBvector = mean + beta*std
-            LB = np.max(mean - beta*std)
+            LB = np.max((mean - beta*std)*self.active_arms)
 
             # update set of active arms
             self.active_arms *= np.where(UBvector > LB, 1, 0)
+            # print('at step {} there are {} active arms'.format(self.step, np.sum(self.active_arms)))
 
 
     

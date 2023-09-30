@@ -29,8 +29,8 @@ print("-----------------------------------------------------------\n")
 
 
 env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-T = 1000
-seeds = 10
+T = 2000
+seeds = 4
 
 
 policies = [IGP_UCB(arms=env.x, T=T), BPE(env.x, T=T)]
