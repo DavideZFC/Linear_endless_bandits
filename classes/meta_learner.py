@@ -1,11 +1,13 @@
 from classes.linucb import linUBC
 from classes.misspec import misSpec
+from classes.PE import PE
 import numpy as np
 from classes.bases import *
 
 
+
 class MetaLearner:
-    def __init__(self, basis, arms, d, lam=1, T=10000, m=1, only_even=False, miss=False, epsilon=0):
+    def __init__(self, basis, arms, d, lam=1, T=10000, m=1, only_even=False, miss=False, pe=False, epsilon=0):
         # dimension of the problem
         self.d = d
 
@@ -50,6 +52,8 @@ class MetaLearner:
         # initialize learner
         if miss:
             self.make_misSpec(lam, m, epsilon)
+        elif pe:
+            self.make_PE()
         else:
             self.make_linUCB(lam, m)       
 
@@ -61,6 +65,10 @@ class MetaLearner:
         # initialize linUCB
         self.learner = linUBC(self.linarms, lam=lam, T=self.T, m=m)
 
+    def make_PE(self):
+        # initialize linUCB
+        self.learner = PE(self.linarms, T=self.T)
+
     def make_misSpec(self, lam, m, epsilon):
         # initialize misslinUCB
         self.learner = misSpec(self.linarms, lam=lam, T=self.T, m=m, epsilon=epsilon, C1=10)
@@ -68,7 +76,10 @@ class MetaLearner:
 
     def pull_arm(self):        
         # ask what arm to pull
-        _, arm = self.learner.pull_arm()
+        try:
+            _, arm = self.learner.pull_arm()
+        except:
+            arm = self.learner.pull_arm()
         return arm
     
     def update(self, arm, reward):

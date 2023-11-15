@@ -55,6 +55,10 @@ class Lipschitz_Environment:
             sigma = 0.3
             self.y = (1/2*np.pi*sigma**2)**0.5*np.exp(-(self.x)**2/(2*sigma**2))
 
+        if (curve == 'bigaussian'):
+            sigma = 0.3
+            self.y = 2.*(1/2*np.pi*sigma**2)**0.5*np.exp(-(self.x)**2/(2*sigma**2))
+
         # even sinusoidal
         elif (curve == 'cosine'):
             self.y = np.cos(np.pi*self.x)
@@ -84,6 +88,13 @@ class Lipschitz_Environment:
             for i in range(self.n_arms):
                 if (abs(self.x[i]-mean_x)<spike_par):
                     self.y[i] = spike_par - abs(self.x[i]-mean_x)
+
+        elif (curve == 'bigspike'):
+            spike_par = 0.5
+            mean_x = self.x[self.n_arms//2]
+            for i in range(self.n_arms):
+                if (abs(self.x[i]-mean_x)<spike_par):
+                    self.y[i] = 4.*(spike_par - abs(self.x[i]-mean_x))
 
         # ugly and not symmetric
         elif (curve == 'random'):
