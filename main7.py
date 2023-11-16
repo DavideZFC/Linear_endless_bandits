@@ -27,12 +27,12 @@ class Experiment(object):
 
 
         env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-        T = 10000
+        T = 100000
         seeds = 5
         # save reward curve
         np.save(dir+'reward_curve', env.y)
 
-        dp = 6
+        dp = 8
 
         policies = [MetaLearner('Legendre', env.x, dp, T=T, m=1.0), MetaLearner('Legendre', env.x, dp, T=T, m=1.0, pe=True)]
         labels = ['OB-LinUCB', 'OB-PE']

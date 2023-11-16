@@ -69,6 +69,11 @@ class Lipschitz_Environment:
             z2 = 0.75
             self.y = -(self.x - z1)**2*(self.x - z2)**2
 
+        elif (curve == 'bigeven_poly'):
+            z1 = -0.75
+            z2 = 0.75
+            self.y = -3.*(self.x - z1)**2*(self.x - z2)**2
+
         # generic polynomial
         elif (curve == 'poly'):
             a = -1
@@ -94,7 +99,7 @@ class Lipschitz_Environment:
             mean_x = self.x[self.n_arms//2]
             for i in range(self.n_arms):
                 if (abs(self.x[i]-mean_x)<spike_par):
-                    self.y[i] = 4.*(spike_par - abs(self.x[i]-mean_x))
+                    self.y[i] = 2.*(spike_par - abs(self.x[i]-mean_x))
 
         # ugly and not symmetric
         elif (curve == 'random'):

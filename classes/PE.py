@@ -55,6 +55,8 @@ def find_optimal_design(A, iter=100, thresh=0):
 
         pi = (1-gamma)*pi + gamma*onehot(best_index, k)
     pi = squeeze_distribution(pi, 2*A.shape[1])
+    if eval_pi(pi, A) > 2*d:
+        print('Error we are fucked')
     return pi
 
 
@@ -66,17 +68,25 @@ class dummy_learner:
         self.n_arms = arms.shape[0]
         self.d = arms.shape[1]
         pi = self.compute_optimal_design(arms)
+        term2 = np.log(2*self.n_arms/delta)
 
-        self.fixed_design = []
+        # self.fixed_design = []
+        upper_bound = 2*self.d /(epsilon**2)*term2 + 2*self.d
+        self.fixed_design = np.zeros(int(upper_bound), dtype=int)
+        current_index = 0
         for i in range(self.n_arms):
             term1 = 2*pi[i]*self.d / (epsilon**2)
-            term2 = np.log(self.n_arms/delta)
             times_to_pull = int(term1*term2)
             if times_to_pull > 0:
                 # print('term 1 = {}, eps = {}, pi = {}, d = {}'.format(term1, epsilon, pi[i], self.d))
                 # print('term 2 = {}'.format(term2))
-                self.fixed_design += [i]*times_to_pull
+                # self.fixed_design += [i]*times_to_pull
+                self.fixed_design[current_index:current_index+times_to_pull] = i
+                current_index += times_to_pull
+        self.fixed_design = self.fixed_design[:current_index]
         self.idx = 0
+        upper_bound = 2*self.d /(epsilon**2)*term2 + 2*self.d
+        # print('fixed design of length {} found. eps = {}, upper bound = {}'.format(len(self.fixed_design), epsilon, upper_bound))
 
         self.design_matrix = np.zeros((self.d, self.d))
         self.load = np.zeros(self.d).reshape(-1,1)
@@ -142,8 +152,12 @@ class PE:
         self.scalar_vector = np.zeros(self.n_arms)
 
         for i in range(self.n_arms):
-            self.scalar_vector[i] = np.dot(theta, self.arms[i,:])
-        
+            if self.active_arms[i]:
+                self.scalar_vector[i] = np.dot(theta, self.arms[i,:])
+            else:
+                # this condition prevents non-active arms from resurrecting
+                self.scalar_vector[i] = -10000
+
         best = np.max(self.scalar_vector)
         self.active_arms = self.scalar_vector > best - 2*self.epsilon
         self.index_converter = np.where(self.active_arms)[0]
