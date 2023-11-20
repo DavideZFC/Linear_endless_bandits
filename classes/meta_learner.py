@@ -7,7 +7,7 @@ from classes.bases import *
 
 
 class MetaLearner:
-    def __init__(self, basis, arms, d, lam=1, T=10000, m=1, only_even=False, miss=False, pe=False, epsilon=0):
+    def __init__(self, basis, arms, d, lam=1, T=10000, m=1, only_even=False, miss=False, pe=False, epsilon=0, IPERPARAMETRO=1):
         # dimension of the problem
         self.d = d
 
@@ -53,7 +53,7 @@ class MetaLearner:
         if miss:
             self.make_misSpec(lam, m, epsilon)
         elif pe:
-            self.make_PE()
+            self.make_PE(IPERPARAMETRO=IPERPARAMETRO)
         else:
             self.make_linUCB(lam, m)       
 
@@ -65,9 +65,9 @@ class MetaLearner:
         # initialize linUCB
         self.learner = linUBC(self.linarms, lam=lam, T=self.T, m=m)
 
-    def make_PE(self):
+    def make_PE(self,IPERPARAMETRO):
         # initialize linUCB
-        self.learner = PE(self.linarms, T=self.T)
+        self.learner = PE(self.linarms, T=self.T,IPERPARAMETRO=IPERPARAMETRO)
 
     def make_misSpec(self, lam, m, epsilon):
         # initialize misslinUCB

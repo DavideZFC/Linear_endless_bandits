@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
+from classes.baselines.SmoothBins import SmoothBins
 import os
 
 import datetime
@@ -27,15 +28,15 @@ class Experiment(object):
 
 
         env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
-        T = 100000
+        T = 10000
         seeds = 5
         # save reward curve
         np.save(dir+'reward_curve', env.y)
 
-        dp = 8
+        dp = 4
 
-        policies = [MetaLearner('Legendre', env.x, dp, T=T, m=1.0), MetaLearner('Legendre', env.x, dp, T=T, m=1.0, pe=True)]
-        labels = ['OB-LinUCB', 'OB-PE']
+        policies = [MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.5), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.25), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.1)]# SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), 
+        labels = ['OB-PE', 'OB-PE05', 'OB-PE025', 'OB-PE01'] #'UMA', 
 
 
         running_times = {}

@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 
@@ -63,7 +64,7 @@ def find_optimal_design(A, iter=100, thresh=0):
 
 
 class dummy_learner:
-    def __init__(self, arms, epsilon, delta):
+    def __init__(self, arms, epsilon, delta, IPERPARAMETRO=1):
         self.arms = arms
         self.n_arms = arms.shape[0]
         self.d = arms.shape[1]
@@ -76,7 +77,7 @@ class dummy_learner:
         current_index = 0
         for i in range(self.n_arms):
             term1 = 2*pi[i]*self.d / (epsilon**2)
-            times_to_pull = int(term1*term2)
+            times_to_pull = int(IPERPARAMETRO*term1*term2)
             if times_to_pull > 0:
                 # print('term 1 = {}, eps = {}, pi = {}, d = {}'.format(term1, epsilon, pi[i], self.d))
                 # print('term 2 = {}'.format(term2))
@@ -115,7 +116,8 @@ class dummy_learner:
 
 
 class PE:
-    def __init__(self, arms_matrix, T=10000.0):
+    def __init__(self, arms_matrix, T=10000.0, base_epsilon=0.3, IPERPARAMETRO=1):
+        self.IPERPARAMETRO = IPERPARAMETRO
 
         # dimension of the arms
         self.d = arms_matrix.shape[1]
@@ -131,21 +133,27 @@ class PE:
         self.delta = T**(-1/2)
 
         # epsilon value
-        self.epsilon = 1.0
+        self.epsilon = base_epsilon
 
         # initialize_learner
         self.active_arms = np.full(self.n_arms, True, dtype=bool)
         self.index_converter = np.where(self.active_arms)[0]
-        self.learner = dummy_learner(arms_matrix, self.epsilon, self.delta)
+
+        # self.times = {'dummy_init': 0.0, 'compute_active_arms': 0.0, 'normal_pulls': 0.0}
+        # self.learner = dummy_learner(arms_matrix, self.epsilon, self.delta)
+
 
     def reset(self):
+        self.times = {'dummy_init': 0.0, 'compute_active_arms': 0.0, 'normal_pulls': 0.0}
         self.t = 0
         self.epsilon = 1.0
         self.active_arms = np.full(self.n_arms, True, dtype=bool)
         self.index_converter = np.where(self.active_arms)[0]
 
         # initialize_learner
-        self.learner = dummy_learner(self.arms, self.epsilon, self.delta)
+        t0 = time.time()
+        self.learner = dummy_learner(self.arms, self.epsilon, self.delta, IPERPARAMETRO=self.IPERPARAMETRO)
+        self.times['dummy_init'] += time.time() - t0
 
     def compute_active_arms(self):
         theta = self.learner.get_theta()
@@ -172,14 +180,21 @@ class PE:
         if np.sum(self.active_arms) < self.d:
             return np.argmax(self.scalar_vector)
         if self.learner.check_status():
+            t0 = time.time()            
             _, arm_idx = self.learner.pull_arm()
+            self.times['normal_pulls'] += time.time() - t0
             return self.convert_index(arm_idx)
         else:
+            t0 = time.time()
             self.compute_active_arms()
+            self.times['compute_active_arms'] += time.time() - t0
             print('{} arms remain valid when eps = {}'.format(np.sum(self.active_arms), self.epsilon))
             self.epsilon /= 2
-            self.learner = dummy_learner(self.arms[self.active_arms], self.epsilon, self.delta)
+            t0 = time.time()
+            self.learner = dummy_learner(self.arms[self.active_arms], self.epsilon, self.delta, IPERPARAMETRO=self.IPERPARAMETRO)
+            self.times['dummy_init'] += time.time() - t0
             _, arm_idx = self.learner.pull_arm()
+            # print(self.times)
             return self.convert_index(arm_idx)
 
 
