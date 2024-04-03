@@ -171,8 +171,6 @@ class misSpec:
 
         return chosen_arm, np.argmax(estimates)
 
-
-
     def estimate_theta(self):
         return np.linalg.solve(self.design_matrix, self.load)
 

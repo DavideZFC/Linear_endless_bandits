@@ -41,7 +41,7 @@ def add_file(filename='TeX/reference_tex.txt'):
     return content
 
 
-dir = 'results\_23_09_07-15_37_critical_poly'
+dir = 'results\_23_11_20-10_28_spike'
 
 with open(dir+"/running_times.json", "r") as f:
     # Convert the dictionary to a JSON string and write it to the file

@@ -74,7 +74,7 @@ class MetaLearner:
         self.learner = misSpec(self.linarms, lam=lam, T=self.T, m=m, epsilon=epsilon, C1=10)
 
 
-    def pull_arm(self):        
+    def pull_arm(self):
         # ask what arm to pull
         try:
             _, arm = self.learner.pull_arm()

@@ -7,6 +7,7 @@ from functions.test_algorithm import test_algorithm
 from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 from classes.baselines.SmoothBins import SmoothBins
+from classes.PoussinUCB import PoussinUCB
 import os
 
 import datetime
@@ -27,7 +28,7 @@ class Experiment(object):
         dir = dir+'/'
 
 
-        env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=100)
+        env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=500)
         T = 10000
         seeds = 5
         # save reward curve
@@ -35,8 +36,8 @@ class Experiment(object):
 
         dp = 4
 
-        policies = [MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.5), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.25), MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.1)]# SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), 
-        labels = ['OB-PE', 'OB-PE05', 'OB-PE025', 'OB-PE01'] #'UMA', 
+        policies = [MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=8, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=6, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=4, pe=True, IPERPARAMETRO=0.25)]# SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), 
+        labels = ['PE025', 'Pous8', 'Pous6', 'Pous4'] #'UMA', 
 
 
         running_times = {}
