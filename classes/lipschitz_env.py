@@ -127,6 +127,12 @@ class Lipschitz_Environment:
         elif curve == 'critical_poly':
             self.y = critical_poly(self.x)
 
+        elif curve == 'expert':
+            self.y = (self.x+1)*np.exp(1/(self.x**2-1.0001))
+        
+        elif curve == 'expertsin':
+            self.y = 3*np.sin(2*np.pi*self.x)*np.exp(1/(self.x**2-1.0001))
+
         self.plot_curve()
 
 

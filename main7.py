@@ -8,6 +8,8 @@ from functions.confidence_bounds import bootstrap_ci
 from functions.plot_from_dataset import plot_data
 from classes.baselines.SmoothBins import SmoothBins
 from classes.PoussinUCB import PoussinUCB
+from classes.fourierucb import FourierUCB
+from classes.baselines.lips_learners import ZOOM
 import os
 
 import datetime
@@ -28,16 +30,20 @@ class Experiment(object):
         dir = dir+'/'
 
 
-        env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=500)
+        env = Lipschitz_Environment(lim=1.0, sigma=1.0, curve = curve, n_arms=1000)
         T = 10000
         seeds = 5
         # save reward curve
         np.save(dir+'reward_curve', env.y)
 
-        dp = 4
+        dlin = 8
+        dpe = 4
+        n_pouslin = 16
+        n_pouspe = 8
 
-        policies = [MetaLearner('Fourier', env.x, dp, T=T, m=1.0, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=8, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=6, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dp, T=T, n_pous=4, pe=True, IPERPARAMETRO=0.25)]# SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), 
-        labels = ['PE025', 'Pous8', 'Pous6', 'Pous4'] #'UMA', 
+        policies = [ZOOM(env.x), SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), FourierUCB(env.x, dlin, m=1), PoussinUCB(env.x, dlin, T=T, m=1, n_pous=n_pouslin), MetaLearner('Fourier', env.x, dpe, T=T, pe=True, IPERPARAMETRO=0.25), PoussinUCB(env.x, dpe, T=T, n_pous=n_pouspe, pe=True, IPERPARAMETRO=0.25)]# SmoothBins(env.x, d=4, bins=8, T=T, m=2, lam=1, epsilon=0.1), 
+        # MetaLearner('Fourier', env.x, dlin, T=T, m=0.1)
+        labels = ['Zooming', 'SmoothBins', 'FourierUCB', 'PousLin{}'.format(dlin), 'PE', 'PousPE{}'.format(dpe)] #'UMA', 
 
 
         running_times = {}
