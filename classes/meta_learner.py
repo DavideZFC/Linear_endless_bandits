@@ -18,7 +18,7 @@ class MetaLearner:
         # time horizon
         self.T = T
 
-        # parameter so see if we have an even function
+        # parameter to see if we have an even function
         self.even = only_even
   
         # choose the basis
